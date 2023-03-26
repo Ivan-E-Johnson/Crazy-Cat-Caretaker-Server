@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, request, redirect
 
 app = Flask(__name__)
 app.config.from_envvar("APPLICATION_SETTINGS")
@@ -7,7 +7,10 @@ app.config.from_envvar("APPLICATION_SETTINGS")
 def hello_world():
     return render_template("index.html", title="Hello")
 
-@app.route("/login")
+@app.route("/login", methods=('GET', 'POST'))
 def login():
-    flash("TEST ALERT")
-    return render_template("login.html")
+    if request.method == 'POST':
+        flash(request.form['username'])
+        return redirect("/")
+    else:
+        return render_template("login.html")
