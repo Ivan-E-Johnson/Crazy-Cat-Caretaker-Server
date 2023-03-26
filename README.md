@@ -53,3 +53,7 @@ This will download any new dependancies added in version controll.
 Use this to install new packages. This will update the Pipenv file for version control.
 
     $ pipenv install <package_name>
+
+## Setting Secret Keys With Codespace
+https://docs.github.com/en/codespaces/managing-your-codespaces/managing-encrypted-secrets-for-your-codespaces
+

@@ -4,7 +4,7 @@
     "cpus": 4
   },
   "waitFor": "onCreateCommand",
-  "updateContentCommand": "pip install -r requirements.txt",
+  "updateContentCommand": "pip install pipenv ; pipenv install",
   "postCreateCommand": "",
   "postAttachCommand": {
     "server": "flask --debug run"
@@ -27,5 +27,8 @@
       ]
     }
   },
+  "remoteEnv": {
+      "PUBLIC_VAR_NAME": "example"
+   },
   "forwardPorts": [5000]
 }
