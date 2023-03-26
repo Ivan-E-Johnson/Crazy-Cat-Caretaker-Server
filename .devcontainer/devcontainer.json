@@ -7,7 +7,7 @@
   "updateContentCommand": "pip install pipenv ; pipenv shell ; pipenv install",
   "postCreateCommand": "",
   "postAttachCommand": {
-    "server": "flask --debug run"
+    "server": "pipenv run flask --debug run"
   },
   "portsAttributes": {
     "5000": {
