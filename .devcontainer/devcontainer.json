@@ -4,10 +4,10 @@
     "cpus": 4
   },
   "waitFor": "onCreateCommand",
-  "updateContentCommand": "pip install pipenv ; pipenv shell ; pipenv install",
+  "updateContentCommand": "pip install -r requirements.txt",
   "postCreateCommand": "",
   "postAttachCommand": {
-    "server": "pipenv run flask --debug run"
+    "server": "flask --debug run"
   },
   "portsAttributes": {
     "5000": {
