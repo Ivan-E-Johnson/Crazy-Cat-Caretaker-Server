@@ -31,5 +31,7 @@
       "APPLICATION_SETTINGS": "config.py",
       "PUBLIC_VAR_NAME": "example"
    },
-  "forwardPorts": [5000]
+"forwardPorts": [
+	5000
+]
 }
