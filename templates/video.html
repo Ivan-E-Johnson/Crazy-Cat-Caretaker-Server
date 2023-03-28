@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script>
+  const evtSource = new EventSource("//api.example.com/ssedemo.php", {
+    withCredentials: true,
+  });
+
+  evtSource.onmessage = (event) => {
+    console.log(event.data)
+  };
+</script>
+
+<canvas id="canvas" width="600" height="600" style="border:solid black 1px;">
+  Your browser does not support canvas element.
+</canvas>
+
+<body>
+  <h1>Flask-SSE Quickstart</h1>
+  <script>
+    var source = new EventSource("{{ url_for('sse.stream') }}");
+    source.addEventListener('greeting', function(event) {
+        var data = JSON.parse(event.data);
+        alert("The server says " + data.message);
+    }, false);
+    source.addEventListener('error', function(event) {
+        alert("Failed to connect to event stream. Is Redis running?");
+    }, false);
+  </script>
+</body>
+
+{% endblock %}

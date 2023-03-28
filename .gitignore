@@ -24,3 +24,6 @@ htmlcov/
 .coverage
 .coverage.*
 *,cover
+
+# Don't commit teachable machine models to git
+converted_keras
