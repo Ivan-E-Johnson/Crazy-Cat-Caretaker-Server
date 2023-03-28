@@ -42,12 +42,12 @@ def touch():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    print(request)
+    print(request.json)
     # check if the post request has the file part
-    if 'file' not in request.files:
-        flash('No file part')
-        return "No file received", 400
 
-    file = request.files['file']
+    print(request.files["media"])
+    file = request.files["media"]
+
+    file.save("test.jpg")
 
     return "Success"
