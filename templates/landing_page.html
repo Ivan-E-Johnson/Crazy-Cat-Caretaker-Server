@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
-{% block title %} {{title}} {% endblock %}
+
+{% block title %} Home Page {% endblock %}
+
 {% block content %}
-    <h1>Crazy Cat Caretaker</h1>
-    <h2>Welcome to our landing page</h2>
+    <div style = "position:relative; left:0px; top:0px; background-color:white;">
+        <h1 style="font-size:21px; color: #203354; font-family: Times New Roman">
+            <img src="static/logo.png" alt="Logo" width="95" height="75">
+            <b>CRAZY CAT CARETAKER</b>
+        </h1>
+    </div>
+    <h2>INTERACT</h2>
     <form method="POST" >
-        <button type = submit>
-            Feed cat
-        </button>
+        <button type="submit" name="button" value="Button1"> feed </button>
+		<button type="submit" name="button" value="Button2"> play </button>
     </form>
 
 {% endblock %}
