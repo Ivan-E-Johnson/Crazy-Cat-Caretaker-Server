@@ -7,6 +7,7 @@ pip install gunicorn
 
 # this takes a while. A different way would be better
 # TODO MUST DO HERE DOWN MANUALLY
+# Actually... sometimes if you wait  A WHILE (10 mins) it will retry and work... 
 sudo su -c "apt-get update && apt-get install ffmpeg libsm6 libxext6  -y"
 
 docker pull redis

@@ -1,6 +1,7 @@
 from threading import Thread
 
-from flask import Flask, render_template, flash, request, redirect, abort
+from flask import Flask, render_template, flash, request, redirect, abort, Response
+from camera import Camera
 import teachable_machine
 from flask_sse import sse
 from redis import Redis
@@ -53,18 +54,31 @@ def touch():
 
 @app.route("/video")
 def video():
+    print("DEBUG; GET VIDEO")
     return render_template("video.html", title="Hello")
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    print(request.files["media"])
     file = request.files["media"]
-    filename = file.filename
+    # filename = file.filename
     image = file.read()
+    Camera.feeds["TESTFEEDKEY"] = image
 
-    sse.publish({"message": "Hello!"}, type='greeting')
-    print(teachable_machine.classify(image))
+    # sse.publish({"message": "Hello!!"}, type='greeting')
+    # print("message sent. done")
+    # print(teachable_machine.classify(image))
 
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
     return "Success"
+
+def gen(camera): 
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
