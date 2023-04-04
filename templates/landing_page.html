@@ -3,16 +3,57 @@
 {% block title %} Home Page {% endblock %}
 
 {% block content %}
-    <div style = "position:relative; left:0px; top:0px; background-color:white;">
-        <h1 style="font-size:21px; color: #203354; font-family: Times New Roman">
-            <img src="static/logo.png" alt="Logo" width="95" height="75">
-            <b>CRAZY CAT CARETAKER</b>
-        </h1>
-    </div>
-    <h2>INTERACT</h2>
+<div style="font-size:21px; color:#203354; font-family: Times New Roman; border:solid;
+            background-color:#f79ac0; margin-top:15px; margin-bottom:30px">
+    <img src="static/logo.png" alt="Logo" width="95" height="75">
+    <b>CRAZY CAT CARETAKER</b>
+</div>
+
+<div style = "font-size:20px; font-family: Times new Roman; margin-bottom:15px"> INTERACT: </div>
+
+<div class="button">
     <form method="POST" >
-        <button type="submit" name="button" value="Button1"> feed </button>
-		<button type="submit" name="button" value="Button2"> play </button>
+        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "button" value="Button1">
+            <b>FEED</b>
+        </button>
+        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "button" value="Button2">
+            <b>PLAY</b>
+        </button>
     </form>
+</div>
+
+<div style = "font-size:20px; font-family: Times new Roman; margin-top:40px; margin-bottom:15px">
+    PICTURES:
+</div>
+
+<div style="border:solid; border-color:#203354; margin-bottom:40px">
+    <div style="font-size:10px;">[area for camera pics]</div>
+    <p>
+        &nbsp;
+    </p>
+    <p>
+        &nbsp;
+    </p>
+    <p>
+        &nbsp;
+    </p>
+</div>
+
+<div style= "border:solid;" class="footer;">
+    <footer>
+        <table border="1" width="100%">
+            <tr>
+                <td style="background-color:#f79ac0;"> &nbsp; </td>
+                <td style="background-color:#2f4d94;"> &nbsp; </td>
+                <td style="background-color:#f0e580;"> &nbsp; </td>
+                <td style="background-color:#5fcfec;"> &nbsp; </td>
+            </tr>
+        </table>
+    </footer>
+</div>
+
+<style>
+    .footer {align-text:bottom}
+</style>
 
 {% endblock %}

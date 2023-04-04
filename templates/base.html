@@ -16,10 +16,6 @@
 </head>
 
 <body>
-    <h1 style="font-size:21px; color: #203354; font-family: Times New Roman">
-            <img src="static/logo.png" alt="Logo" width="95" height="75">
-            <b>CRAZY CAT CARETAKER</b>
-    </h1>
     <div class="container" style= "font-size:21px; font-family: Times New Roman">
         {% for category, message in get_flashed_messages(with_categories=true) %}
         <div class="alert alert-{{category != 'message' and category  or 'danger'}}">{{ message }}</div>

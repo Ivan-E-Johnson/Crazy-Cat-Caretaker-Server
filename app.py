@@ -13,7 +13,7 @@ def hello_world():
 def login():
     if request.method == 'POST':
         flash(request.form['username'])
-        return redirect("/")
+        return redirect("/landing")
     else:
         return render_template("login.html")
 
