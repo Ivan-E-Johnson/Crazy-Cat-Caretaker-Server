@@ -13,26 +13,29 @@ app.config.from_envvar("APPLICATION_SETTINGS")
 
 # TODO redis needed for SSE, what does it do?
 app.config["REDIS_URL"] = "redis://localhost"
-app.register_blueprint(sse, url_prefix='/stream')  # For sse events
+app.register_blueprint(sse, url_prefix="/stream")  # For sse events
 
-@app.route("/login", methods=('GET', 'POST'))
+
+@app.route("/login", methods=("GET", "POST"))
 def login():
-    if request.method == 'POST':
-        flash(request.form['username'])
+    if request.method == "POST":
+        flash(request.form["username"])
         return redirect("/landing")
     else:
         return render_template("login.html")
 
-@app.route("/", methods=('GET', 'POST'))
+
+@app.route("/", methods=("GET", "POST"))
 def landing_page():
     if request.method == "POST":
-        if request.form['button'] == 'Button1':
+        if request.form["button"] == "Button1":
             flash("TODO: Feeding the cat page")
             return render_template("feeding.html", title="Land")
         else:
             flash("TODO: Laser pointer control page")
             return render_template("playing.html", title="Land")
     return render_template("landing_page.html", title="Land")
+
 
 @app.route("/touch")
 def touch():
@@ -44,7 +47,8 @@ def video():
     print("DEBUG; GET VIDEO")
     return render_template("video.html", title="Hello")
 
-@app.route('/upload', methods=['POST'])
+
+@app.route("/upload", methods=["POST"])
 def upload_file():
     file = request.files["media"]
     # filename = file.filename
@@ -59,13 +63,13 @@ def upload_file():
     # file.save(filename)
     return "Success"
 
-def gen(camera): 
+
+def gen(camera):
     while True:
         frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
-@app.route('/video_feed')
+
+@app.route("/video_feed")
 def video_feed():
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(Camera()), mimetype="multipart/x-mixed-replace; boundary=frame")
