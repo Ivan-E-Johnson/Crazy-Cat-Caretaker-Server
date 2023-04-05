@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Play page goes here. Should have a video feed and laser pointer controls. </h1>
+<div class="video_viewer">
+    <img src="{{ url_for('video_feed') }}" alt="Video Stream" >
+</div>
+
+{% endblock %}
+

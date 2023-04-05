@@ -5,3 +5,5 @@
 SECRET_KEY = "lH4pzHO4Mqc2q01gW0HuUeUkhEoKw8lw"
 
 # Add more settings here
+
+UPLOAD_FOLDER = "temp_uploads_testing_only"
