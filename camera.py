@@ -2,7 +2,7 @@ from time import time
 
 
 class Camera(object):
-    feeds = {"TESTFEEDKEY": open("temp_uploads_testing_only/Octocat.png", "rb").read()}
+    feeds = {"TESTFEEDKEY": open("static/play.png", "rb").read()}
 
     def __init__(self):
         self.feed_key = "TESTFEEDKEY"

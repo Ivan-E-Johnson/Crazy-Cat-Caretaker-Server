@@ -1,26 +1,26 @@
-from threading import Thread
-
 from flask import Flask, render_template, flash, request, redirect, abort, Response
 from camera import Camera
 import teachable_machine
 from flask_sse import sse
 from redis import Redis
-from rq import Queue
 
 app = Flask(__name__)
+
+# Configure Redis server for dynamic page updates
 r = Redis()
+app.config["REDIS_URL"] = "redis://localhost"
 app.config.from_envvar("APPLICATION_SETTINGS")
 
-# TODO redis needed for SSE, what does it do?
-app.config["REDIS_URL"] = "redis://localhost"
 app.register_blueprint(sse, url_prefix="/stream")  # For sse events
 
 
 @app.route("/login", methods=("GET", "POST"))
 def login():
     if request.method == "POST":
-        flash(request.form["username"])
-        return redirect("/landing")
+        flash(
+            f"TODO Implement login authentication. Username {request.form['username']}"
+        )
+        return redirect("/")
     else:
         return render_template("login.html")
 
@@ -35,17 +35,6 @@ def landing_page():
             flash("TODO: Laser pointer control page")
             return render_template("playing.html", title="Land")
     return render_template("landing_page.html", title="Land")
-
-
-@app.route("/touch")
-def touch():
-    return render_template("touch.html", title="Hello")
-
-
-@app.route("/video")
-def video():
-    print("DEBUG; GET VIDEO")
-    return render_template("video.html", title="Hello")
 
 
 @app.route("/upload", methods=["POST"])
