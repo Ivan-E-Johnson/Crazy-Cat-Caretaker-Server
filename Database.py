@@ -6,7 +6,9 @@ app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 home_ref = db.collection('Home')
+home_ref
 docs = home_ref.stream()
+
 
 for col in db.collections():
     print(f'{col.id}')
