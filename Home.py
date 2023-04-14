@@ -1,22 +1,53 @@
+
+
+
 class House(object):
     def __init__(self, mac_address, users=[], cats=[]):
         self.mac_address = mac_address
         self.users = users
         self.cats = cats
 
-        @staticmethod
-        def from_dict(source):
-            mac_address = source['mac_address']
-            users = [Users.from_dict(user_dict) for user_dict in source.get('users', [])]
-            cats = [Cat.from_dict(cat_dict) for cat_dict in source.get('cats', [])]
-            return House(mac_address, users, cats)
+    @staticmethod
+    def from_dict(source):
+        mac_address = source['userID']
+        users = [Users.from_dict(user_dict) for user_dict in source.get('users', [])]
+        cats = [Cat.from_dict(cat_dict) for cat_dict in source.get('cats', [])]
+        return House(mac_address, users, cats)
+    def to_dict(self):
+        return {
+            'userID': self.mac_address,
+            'users': [user.to_dict() for user in self.users],
+            'cats': [cat.to_dict() for cat in self.cats],
+        }
 
-        def to_dict(self):
-            return {
-                'mac_address': self.mac_address,
-                'users': [user.to_dict() for user in self.users],
-                'cats': [cat.to_dict() for cat in self.cats],
-            }
+    # Getter and setter for mac_address
+    @classmethod
+    def get_mac_address(self):
+        return self._mac_address
+
+    @property
+    def set_mac_address(self, value):
+        self._mac_address = value
+
+    # Getter and setter for users
+    @classmethod
+    def get_users(self):
+        return self._users
+
+    @property
+    def set_users(self, value):
+        self._users = value
+
+    # Getter and setter for cats
+    @classmethod
+    def get_cats(self):
+        return self._cats
+
+    @property
+    def set_cats(self, value):
+        self._cats = value
+
+
 
 class Users(object):
     def __init__(self, id, name):
