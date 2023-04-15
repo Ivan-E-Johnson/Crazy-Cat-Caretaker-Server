@@ -50,14 +50,19 @@ def login():
         password = request.form.get("password")
         print(f'Email: {email} \t Password: {password}')
         try:
-            #user = auth.create_user_with_email_and_password(email,password)
+            #
             #TODO fix this to work and not just create user
-            user = auth.sign_in_with_email_and_password(email, password)
-            print("Got HERE")
+            if "create_user" in request.form:
+                user = auth.create_user_with_email_and_password(email, password)
+                flash(f"Created New User: {email}!")
+            else:
+                user = auth.sign_in_with_email_and_password(email, password)
+                flash(f"Signed in as {email}!")
+            print(user)
             session['user'] = user
-        except:
-
-            flash("Failed to log in ")
+        except Exception as e:
+            print(repr(e))
+            flash(f"Failed to log with error message: {e}")
         return redirect("/")
     else:
         return render_template("login.html")
