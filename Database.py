@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
-from Home import *;
+from Home import *
 
 cat1 = Cat(id="Test_ID", name="KITTY", max_food=1, daily_food=.4)
 cat2 = Cat(id="Test_ID2", name="KITTY2", max_food=1, daily_food=.4)
