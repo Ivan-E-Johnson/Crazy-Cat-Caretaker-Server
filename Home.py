@@ -20,6 +20,8 @@ class House(object):
             'cats': [cat.to_dict() for cat in self.cats],
         }
 
+
+
     # Getter and setter for mac_address
     @classmethod
     def get_mac_address(self):
@@ -89,4 +91,6 @@ class Cat(object):
             'max_food': self.max_food,
             'daily_food': self.daily_food,
         }
+
+
 

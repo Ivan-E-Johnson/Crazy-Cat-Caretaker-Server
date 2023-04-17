@@ -1,5 +1,6 @@
 import pyrebase
-config = {
+from flask import session, redirect
+AUTH_CONFIG = {
     'apiKey': "AIzaSyBx6ut501XQhSePVu7Fi8SbhfYMuOAD344",
     'authDomain': "testingccc-3b63d.firebaseapp.com",
     'databaseURL': "https://testingccc-3b63d-default-rtdb.firebaseio.com",
@@ -11,16 +12,29 @@ config = {
 }
 
 
-firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
+def login_required(func):
+    def wrapper():
+        print("WE GOT HERE")
+        if 'user' in session:
+            return func()
+        else:
+            return redirect("/login")
+    return wrapper
 
-email = "teat@test.com"
-password = "123456"
+if __name__ == "__main__":
 
-user = auth.create_user_with_email_and_password(email,password) # want ID token
-print(user)
-# user = auth.sign_in_with_email_and_password(email,password)
-# print(user)
 
-info = auth.get_account_info(user["idToken"])
-print(info)
+
+    firebase = pyrebase.initialize_app(AUTH_CONFIG)
+    auth = firebase.auth()
+
+    email = "teat@test.com"
+    password = "123456"
+
+    user = auth.create_user_with_email_and_password(email,password) # want ID token
+    print(user)
+    # user = auth.sign_in_with_email_and_password(email,password)
+    # print(user)
+
+    info = auth.get_account_info(user["idToken"])
+    print(info)
