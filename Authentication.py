@@ -1,5 +1,6 @@
 import pyrebase
 from flask import session, redirect
+from functools import wraps
 
 AUTH_CONFIG = {
     "apiKey": "AIzaSyBx6ut501XQhSePVu7Fi8SbhfYMuOAD344",
@@ -14,13 +15,13 @@ AUTH_CONFIG = {
 
 
 def login_required(func):
-    def wrapper():
+    @wraps(func)
+    def wrapper(*args, **kwds):
         print("WE GOT HERE")
         if "user" in session:
-            return func()
+            return func(*args, **kwds)
         else:
             return redirect("/login")
-
     return wrapper
 
 
