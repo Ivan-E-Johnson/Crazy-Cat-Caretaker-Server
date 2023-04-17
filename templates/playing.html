@@ -4,8 +4,28 @@
 
 <h1>Play page goes here. Should have a video feed and laser pointer controls. </h1>
 <div class="video_viewer">
-    <img src="{{ url_for('video_feed') }}" alt="Video Stream" >
+    <img id="video" src="{{ url_for('video_feed') }}" alt="Video Stream" style="display:none">
+    <div id="loading" class="spinner-border mx-auto my-auto" role="status" style="display:block">
+      <span class="sr-only">Loading...</span>
+    </div>
 </div>
+
+<script>
+    var source = new EventSource("{{ url_for('sse.stream') }}");
+    source.addEventListener("{{ video_key }}", function(event) {
+        data = JSON.parse(event.data)
+        var loading = document.getElementById("loading");
+        var video = document.getElementById("video");
+
+        if (data.started) {
+            loading.style.display = "none";
+            video.style.display = "block";
+        } else {
+            loading.style.display = "block";
+            video.style.display = "none";
+        }
+    }, false);
+</script>
 
 {% endblock %}
 
