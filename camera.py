@@ -14,4 +14,8 @@ class Camera(object):
         self.feed_key = "TESTFEEDKEY"
 
     def get_frame(self):
-        return Camera.feeds[self.feed_key] if self.feed_key in Camera.feeds else Camera.default
+        return (
+            Camera.feeds[self.feed_key]
+            if self.feed_key in Camera.feeds
+            else Camera.default
+        )

@@ -24,3 +24,6 @@ htmlcov/
 .coverage
 .coverage.*
 *,cover
+/testingccc-3b63d-firebase-adminsdk-vyn5d-3c9e0df96a.json
+/flask_session/
+
