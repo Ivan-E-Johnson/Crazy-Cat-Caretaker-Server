@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %} Login {% endblock %}
+
 {% block content %}
     <h1 style="font-size:22px; margin-bottom:15px"> <b>LOGIN</b> </h1>
     <form method="post">
@@ -11,7 +13,7 @@
                 <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password">
         </div>
         <div class="form-group">
-            <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg" name = "submit" value="submit">
+            <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg" name = "button" value="login">
                 <b>Submit</b>
             </button>
             <button style="background-color:#843da8; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg" name = "create_user" value="create_user">

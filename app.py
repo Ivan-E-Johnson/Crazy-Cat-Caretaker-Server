@@ -91,6 +91,9 @@ def landing_page():
         if request.form["button"] == "Button1":
             flash("TODO: Feeding the cat page")
             return render_template("feeding.html", title="Land")
+        if request.form["button"] == "logout button":
+            flash("Logged out")
+            return redirect("login.html")
         else:
             flash("TODO: Laser pointer control page")
             return redirect("/playing")
@@ -112,6 +115,11 @@ def upload_file():
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
     return "Success"
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    return 'Signup'
 
 
 @app.route("/stream", methods=["POST"])
