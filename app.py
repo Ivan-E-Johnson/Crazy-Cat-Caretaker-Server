@@ -23,7 +23,7 @@ app = Flask(__name__)
 # Configure Redis server for dynamic page updates
 r = Redis()
 app.config["REDIS_URL"] = "redis://localhost"
-#app.config.from_envvar("APPLICATION_SETTINGS")  # TODO send this to entire team so that we can access it
+app.config.from_envvar("APPLICATION_SETTINGS")  # TODO send this to entire team so that we can access it
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.register_blueprint(sse, url_prefix="/stream")  # For sse events
