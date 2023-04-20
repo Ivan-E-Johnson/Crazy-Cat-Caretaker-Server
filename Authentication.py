@@ -1,5 +1,6 @@
 import pyrebase
-from flask import session, redirect
+import requests
+from flask import session, redirect, flash
 from functools import wraps
 
 AUTH_CONFIG = {
@@ -12,6 +13,34 @@ AUTH_CONFIG = {
     "appId": "1:1031446491621:web:971d8fff08ce27a547bf0c",
     "measurementId": "G-M1PX452PG9",
 }
+
+################################################################
+# AUTHENTICATION
+firebase = pyrebase.initialize_app(AUTH_CONFIG)
+auth = firebase.auth()
+################################################################
+
+
+def create_user(email, password):
+    try:
+        user = auth.create_user_with_email_and_password(email, password)
+    except requests.exceptions.HTTPError as e:
+        flash(f"User creation failed: {e}")
+        return None
+    flash(f"Created New User: {email}!")
+    login(email, password)
+    return user
+
+
+def login(email, password):
+    try:
+        user = auth.sign_in_with_email_and_password(email, password)
+    except requests.exceptions.HTTPError as e:
+        flash(f"Log in failed: {e} {type(e)} {e.request}")
+        return None
+    flash(f"Signed in as {email}!")
+    session["user"] = user
+    return user
 
 
 def login_required(func):
