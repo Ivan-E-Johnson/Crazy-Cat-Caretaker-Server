@@ -18,6 +18,13 @@ from redis import Redis
 import pyrebase
 import Authentication
 
+#### VERY IMPORTANT
+## FIXES BUG BETWEEN GUINICORN AND FIRESTORE
+import grpc.experimental.gevent as grpc_gevent
+grpc_gevent.init_gevent()
+# https://stackoverflow.com/questions/57742213/gunicorn-worker-timeout-while-using-any-firestore-function-not-even-a-get
+##### Removing will kill whole application
+
 app = Flask(__name__)
 
 # Configure Redis server for dynamic page updates
@@ -28,11 +35,6 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.register_blueprint(sse, url_prefix="/stream")  # For sse events
 Session(app)
-################################################################
-# AUTHENTICATION
-firebase = pyrebase.initialize_app(Authentication.AUTH_CONFIG)
-auth = firebase.auth()
-################################################################
 
 
 @app.route("/login", methods=("GET", "POST"))
@@ -40,28 +42,31 @@ def login():
     if "user" in session:
         return redirect("/")
     if request.method == "POST":
-        flash(f"TODO Implement login authentication. Email {request.form['email']}")
+        if "create_user" in request.form:
+            return redirect("/signup")
         email = request.form.get("email")
         password = request.form.get("password")
-        print(f"Email: {email} \t Password: {password}")
-        try:
-            #
-            # TODO fix this to work and not just create user
-            if "create_user" in request.form:
-                user = auth.create_user_with_email_and_password(email, password)
-                flash(f"Created New User: {email}!")
-            else:
-                user = auth.sign_in_with_email_and_password(email, password)
-                flash(f"Signed in as {email}!")
-            print(user)
-            session["user"] = user
-        except Exception as e:
-            print(repr(e))
-            flash(f"Failed to log with error message: {e}")
+        Authentication.login(email, password)
         return redirect("/")
     else:
         return render_template("login.html")
 
+
+@app.route("/signup", methods=("GET", "POST"))
+def signup():
+    if "user" in session:
+        return redirect("/")
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        mac_address  = request.form.get("mac_address")
+        success = Authentication.create_user(email, password, mac_address)
+        if success:
+            return redirect("/")
+        return redirect(request.referrer)
+
+    else:
+        return render_template("signup.html")
 
 @app.route("/logout")
 def logout():

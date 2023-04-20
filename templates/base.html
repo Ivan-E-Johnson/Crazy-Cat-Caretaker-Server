@@ -18,9 +18,34 @@
 
 <body>
     <div class="container" style= "font-size:21px; font-family: Times New Roman">
+        <div style="font-size:21px; color:#203354; font-family: Times New Roman; border:solid;
+            background-color:#f79ac0; margin-top:15px; margin-bottom:30px">
+
+            <div class="container">
+              <div class="row">
+                <div class="col-8">
+                  <img src="static/logo.png" alt="Logo" width="95" height="75">
+                    <b>CRAZY CAT CARETAKER</b>
+                </div>
+                <div class="col-sm-2 my-auto text-right">
+                 {% if "user" in session %}
+                    <form action="{{ url_for('logout') }}">
+                        <button style="background-color:#843da8; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg" name = "create_user" value="create_user">
+                            <b>Logout</b>
+                        </button>
+                    </form>
+                   {% endif %}
+                </div>
+              </div>
+            </div>
+
+
+        </div>
+
         {% for category, message in get_flashed_messages(with_categories=true) %}
         <div class="alert alert-{{category != 'message' and category  or 'danger'}}">{{ message }}</div>
         {% endfor %}
+
         {% block content %} {% endblock %}
     </div>
 
