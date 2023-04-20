@@ -30,6 +30,9 @@ class DatabaseObject():
             new_attrs.append(attr_class.from_dict(attr))
         self.__dict__[name] = new_attrs
 
+    def _transform_attr(self, name, attr_class, attr_dict):
+        self.__dict__[name] = attr_class.from_dict(attr_dict)
+
     @classmethod
     def get(cls, primary_key):
         data = cls.ref.document(primary_key).get()
@@ -54,6 +57,8 @@ class DatabaseObject():
             if type(val) == list:
                 val = [i.to_dict() for i in val]
                 dict[key] = val
+            elif issubclass(type(val), DatabaseObject):
+                dict[key] = val.to_dict()
             else:
                 dict[key] = val
         return dict
@@ -72,11 +77,12 @@ class Users(DatabaseObject):
 class House(DatabaseObject):
     ref = db.collection("Home")
     pk = "mac_address"
-    attrs = ["mac_address", "cats"]
+    attrs = ["mac_address", "cats", "events"]
 
-    def __init__(self, mac_address, cats):
+    def __init__(self, mac_address, cats, events):
         self.mac_address = mac_address
         self.cats = cats
+        self.events = events
 
     @classmethod
     def from_dict(cls, source):
@@ -84,6 +90,7 @@ class House(DatabaseObject):
         if new_class is None:
             return None
         new_class._transform_attrs("cats", Cats, new_class.cats)
+        new_class._transform_attr("events", HomeEvents, new_class.events)
         return new_class
 
     def add_cat(self, cat):
@@ -91,7 +98,7 @@ class House(DatabaseObject):
 
 
 class Cats(DatabaseObject):
-    ref = db.collection("Cats")
+    ref = None # Cats should be added to a house not to the db directly
     pk = None # Cats should be added to a house not to the db directly
     attrs = ["name", "max_food", "daily_food"]
 
@@ -99,5 +106,16 @@ class Cats(DatabaseObject):
         self.name = name
         self.max_food = max_food
         self.daily_food = daily_food
+
+
+class HomeEvents(DatabaseObject):
+    ref = None  # Events should be added to a house not to the db directly
+    pk = None  # Events should be added to a house not to the db directly
+    attrs = ["laser_state", "dispense", "video"]
+
+    def __init__(self, laser_state, dispense, video):
+        self.laser_state = laser_state
+        self.dispense = dispense
+        self.video = video
 
 

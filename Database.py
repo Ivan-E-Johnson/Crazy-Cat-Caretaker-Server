@@ -4,11 +4,10 @@ from firebase_admin import credentials
 from Home import *
 
 new_cat = Cats("New Cat", 123, 3)
-house = House.get("123445677")
-house.add_cat(new_cat)
+house: House = House.get("123445677")
+house.events.laser_state = True
+print(house)
 house.create()
-print(house.to_dict())
-
 
 # cat1 = Cat(id="Test_ID", name="KITTY", max_food=1, daily_food=0.4)
 # cat2 = Cat(id="Test_ID2", name="KITTY2", max_food=1, daily_food=0.4)
