@@ -18,6 +18,13 @@ from redis import Redis
 import pyrebase
 import Authentication
 
+#### VERY IMPORTANT
+## FIXES BUG BETWEEN GUINICORN AND FIRESTORE
+import grpc.experimental.gevent as grpc_gevent
+grpc_gevent.init_gevent()
+# https://stackoverflow.com/questions/57742213/gunicorn-worker-timeout-while-using-any-firestore-function-not-even-a-get
+##### Removing will kill whole application
+
 app = Flask(__name__)
 
 # Configure Redis server for dynamic page updates
@@ -53,8 +60,11 @@ def signup():
         email = request.form.get("email")
         password = request.form.get("password")
         mac_address  = request.form.get("mac_address")
-        Authentication.create_user(email, password, mac_address)
-        return redirect("/")
+        success = Authentication.create_user(email, password, mac_address)
+        if success:
+            return redirect("/")
+        return redirect(request.referrer)
+
     else:
         return render_template("signup.html")
 

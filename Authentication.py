@@ -1,6 +1,6 @@
 import pyrebase
 import requests
-from Home import Users
+from Home import Users, House, Cats, DatabaseObject
 from flask import session, redirect, flash
 from functools import wraps
 
@@ -21,27 +21,32 @@ firebase = pyrebase.initialize_app(AUTH_CONFIG)
 auth = firebase.auth()
 ################################################################
 
-
 def create_user(email, password, mac_address):
+    house = House.get(mac_address)
+    if house is None:
+        flash(f"Could not find a registered device with a mac address of {mac_address}")
+        return False
     try:
         user = auth.create_user_with_email_and_password(email, password)
         Users("Kian", "12345").create()
     except requests.exceptions.HTTPError as e:
         flash(f"User creation failed: {e}")
-        return None
+        return False
     flash(f"Created New User: {email}!")
     login(email, password)
-    return user
+    return True
 
 
 def login(email, password):
     try:
         user = auth.sign_in_with_email_and_password(email, password)
+        user_db: Users = Users.get(email)
     except requests.exceptions.HTTPError as e:
         flash(f"Log in failed: {e} {type(e)} {e.request}")
         return None
     flash(f"Signed in as {email}!")
     session["user"] = user
+    session["mac_address"] = user_db.mac_address
     return user
 
 

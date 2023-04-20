@@ -8,7 +8,6 @@ app = initialize_app(cred)
 db = firestore.client()
 
 home_ref = db.collection("Home")
-print(db.collection("Home").document("SHOWUP").get().to_dict()["cats"])
 
 class DatabaseObject():
     ref = db
@@ -33,10 +32,13 @@ class DatabaseObject():
 
     @classmethod
     def get(cls, primary_key):
-        return cls.from_dict(cls.ref.document(primary_key).get().to_dict())
+        data = cls.ref.document(primary_key).get()
+        return None if data is None else cls.from_dict(data.to_dict())
 
     @staticmethod
     def _from_dict(cls, source):
+        if source is None:
+            return None
         args = []
         for arg in cls.attrs:
             args.append(source[arg])
@@ -44,7 +46,7 @@ class DatabaseObject():
 
     @classmethod
     def from_dict(cls, source):
-        return cls._from_dict(cls, source)
+        return None if source is None else cls._from_dict(cls, source)
 
     def to_dict(self):
         dict = {}
@@ -79,6 +81,8 @@ class House(DatabaseObject):
     @classmethod
     def from_dict(cls, source):
         new_class = super()._from_dict(cls, source)
+        if new_class is None:
+            return None
         new_class._transform_attrs("cats", Cats, new_class.cats)
         return new_class
 
