@@ -28,7 +28,7 @@ def create_user(email, password, mac_address):
         return False
     try:
         user = auth.create_user_with_email_and_password(email, password)
-        Users("Kian", "12345").create()
+        Users(email, mac_address).create()
     except requests.exceptions.HTTPError as e:
         flash(f"User creation failed: {e}")
         return False
