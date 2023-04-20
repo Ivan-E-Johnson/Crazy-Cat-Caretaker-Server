@@ -52,7 +52,8 @@ def signup():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-        Authentication.create_user(email, password)
+        mac_address  = request.form.get("mac_address")
+        Authentication.create_user(email, password, mac_address)
         return redirect("/")
     else:
         return render_template("signup.html")

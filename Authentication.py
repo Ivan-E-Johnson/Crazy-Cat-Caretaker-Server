@@ -1,5 +1,6 @@
 import pyrebase
 import requests
+from Home import Users
 from flask import session, redirect, flash
 from functools import wraps
 
@@ -21,9 +22,10 @@ auth = firebase.auth()
 ################################################################
 
 
-def create_user(email, password):
+def create_user(email, password, mac_address):
     try:
         user = auth.create_user_with_email_and_password(email, password)
+        Users("Kian", "12345").create()
     except requests.exceptions.HTTPError as e:
         flash(f"User creation failed: {e}")
         return None
