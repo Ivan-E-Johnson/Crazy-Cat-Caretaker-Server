@@ -68,12 +68,14 @@ def signup():
         return render_template("signup.html")
 
 @app.route("/logout")
+@Authentication.login_required
 def logout():
     # TODO ADD logout button
     session.pop("user")
     return redirect("/")
 
 @app.route("/feeding")
+@Authentication.login_required
 def feeding():
     return render_template("feeding.html")
 
@@ -86,6 +88,22 @@ def playing():
         "playing.html", video_key=video_key, started=video_key in Camera.feeds
     )
 
+
+@app.route("/view_profiles", methods=["GET", "POST"])
+@Authentication.login_required
+def view_profiles():
+    return render_template("view_profiles.html")
+
+
+@app.route("/add_cat", methods=["GET", "POST"])
+@Authentication.login_required
+def add_cat():
+    return render_template("add_cat.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    return render_template("signup.html")
 
 @app.route("/", methods=("GET", "POST"))
 @Authentication.login_required
@@ -118,16 +136,6 @@ def upload_file():
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
     return "Success"
-
-
-@app.route("/add_cat", methods=["GET", "POST"])
-def add_cat():
-    return render_template("add_cat.html")
-
-
-@app.route("/signup", methods=["GET", "POST"])
-def signup():
-    return render_template("signup.html")
 
 
 @app.route("/stream", methods=["POST"])
