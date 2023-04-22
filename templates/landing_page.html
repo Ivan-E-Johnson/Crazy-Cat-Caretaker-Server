@@ -22,12 +22,15 @@
 
 <div class="button">
     <form method="GET" action="/feeding">
-        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "feeding_button" value="clicked">
+        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn-block" name = "feeding_button" value="clicked">
             <b>FEED</b>
         </button>
     </form>
+    <p>
+
+    </p>
     <form method="GET" action="/playing">
-        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "playing_button" value="clicked">
+        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn-block" name = "playing_button" value="clicked">
             <b>PLAY</b>
         </button>
     </form>
@@ -45,6 +48,15 @@
     <p>
         &nbsp;
     </p>
+</div>
+
+<!--Button to add a new cat profile-->
+<div class="button">
+    <form action="/add_cat" method="GET">
+        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" name = "add_cat" value="clicked">
+            <b>Add Cat Profile</b>
+        </button>
+    </form>
 </div>
 
 <div style= "border:solid;" class="footer;">

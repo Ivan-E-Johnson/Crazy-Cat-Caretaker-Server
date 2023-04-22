@@ -90,16 +90,16 @@ def playing():
 @app.route("/", methods=("GET", "POST"))
 @Authentication.login_required
 def landing_page():
-    if request.method == "GET":
-        if request.form["feeding_button"] == "clicked":
-            flash("TODO: Feeding the cat page")
-            return render_template("feeding.html")
-        if request.form["logout_button"] == "clicked":
-            flash("Logged out")
-            return render_template("login.html")
-        if request.form["playing_button"] == "clicked":
-            flash("TODO: Laser pointer control page")
-            return render_template("playing.html")
+    # if request.method == "GET":
+        # if request.form["feeding_button"] == "clicked":
+        #     flash("TODO: Feeding the cat page")
+        #     return render_template("feeding.html")
+        # if request.form["logout_button"] == "clicked":
+        #     flash("Logged out")
+        #     return render_template("login.html")
+    #     if request.form["playing_button"] == "clicked":
+    #         flash("TODO: Laser pointer control page")
+    #         return render_template("playing.html")
     return render_template("landing_page.html")
 
 
@@ -120,9 +120,14 @@ def upload_file():
     return "Success"
 
 
+@app.route("/add_cat", methods=["GET", "POST"])
+def add_cat():
+    return render_template("add_cat.html")
+
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    return 'Signup'
+    return render_template("signup.html")
 
 
 @app.route("/stream", methods=["POST"])
