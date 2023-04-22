@@ -13,7 +13,6 @@ class_names = open("converted_keras/labels.txt", "r").readlines()
 
 def classify(image):
     nparr = np.fromstring(image, np.uint8)
-    print(np.shape(nparr))
     image = cv2.resize(nparr, (224, 224), interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
