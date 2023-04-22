@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 
+{% block title %} Feed {% endblock %}
+
 {% block content %}
-    <h1 style="font-size:22px; margin-bottom:15px"> <b>LOGIN</b> </h1>
-    <form method="post">
+    <h1 style="font-size:21px; "><b>CREATE AN ACCOUNT:</b></h1>
+
+     <form method="POST">
         <div class="form-group" style="margin-bottom:25px">
                 <label for="email" style="font-size:13px">EMAIL:</label>
                 <input type="text" name="email" class="form-control" id="email" placeholder="Enter your email">

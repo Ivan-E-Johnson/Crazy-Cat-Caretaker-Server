@@ -52,6 +52,9 @@ code {
     font-size: 0.75rem;
 }
 
-right {
-        float: right;
- }
+.centered-button {
+display: block;
+margin: auto;
+}
+
+
