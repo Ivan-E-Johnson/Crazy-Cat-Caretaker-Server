@@ -37,7 +37,7 @@ app.register_blueprint(sse, url_prefix="/stream")  # For sse events
 Session(app)
 
 
-@app.route("/login", methods=("GET", "POST"))
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if "user" in session:
         return redirect("/")
@@ -50,7 +50,6 @@ def login():
         return redirect("/")
     else:
         return render_template("login.html")
-
 
 @app.route("/signup", methods=("GET", "POST"))
 def signup():
@@ -74,8 +73,12 @@ def logout():
     session.pop("user")
     return redirect("/")
 
+@app.route("/feeding")
+def feeding():
+    return render_template("feeding.html")
 
-@app.route("/playing")
+
+@app.route("/playing", methods=["GET", "POST"])
 @Authentication.login_required
 def playing():
     video_key = "TESTFEEDKEY"
@@ -87,17 +90,17 @@ def playing():
 @app.route("/", methods=("GET", "POST"))
 @Authentication.login_required
 def landing_page():
-    if request.method == "POST":
-        if request.form["button"] == "Button1":
+    if request.method == "GET":
+        if request.form["feeding_button"] == "clicked":
             flash("TODO: Feeding the cat page")
-            return render_template("feeding.html", title="Land")
-        if request.form["button"] == "logout button":
+            return render_template("feeding.html")
+        if request.form["logout_button"] == "clicked":
             flash("Logged out")
-            return redirect("login.html")
-        else:
+            return render_template("login.html")
+        if request.form["playing_button"] == "clicked":
             flash("TODO: Laser pointer control page")
-            return redirect("/playing")
-    return render_template("landing_page.html", title="Land")
+            return render_template("playing.html")
+    return render_template("landing_page.html")
 
 
 @app.route("/upload", methods=["POST"])

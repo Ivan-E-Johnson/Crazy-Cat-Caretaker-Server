@@ -4,13 +4,13 @@
 
 {% block content %}
 
-<div class="button">
-    <form method="POST">
-        <button style="font-size:10px;" name="button" value="logout button">
+<form action="/login" method="GET">
+    <div class="button">
+        <button type="submit" style="font-size:10px;" name="logout_button" value="clicked">
             <b>LOG OUT</b>
         </button>
-    </form>
-</div>
+    </div>
+</form>
 
 <div style="font-size:21px; color:#203354; font-family: Times New Roman; border:solid;
             background-color:#f79ac0; margin-top:15px; margin-bottom:30px">
@@ -21,11 +21,13 @@
 <div style = "font-size:20px; font-family: Times new Roman; margin-bottom:15px"> INTERACT: </div>
 
 <div class="button">
-    <form method="POST" >
-        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "button" value="Button1">
+    <form method="GET" action="/feeding">
+        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "feeding_button" value="clicked">
             <b>FEED</b>
         </button>
-        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "button" value="Button2">
+    </form>
+    <form method="GET" action="/playing">
+        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg btn-block" name = "playing_button" value="clicked">
             <b>PLAY</b>
         </button>
     </form>

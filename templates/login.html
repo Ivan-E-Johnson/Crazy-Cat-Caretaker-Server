@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1 style="font-size:22px; margin-bottom:15px"> <b>LOGIN</b> </h1>
-    <form method="post">
+    <form method="POST">
         <div class="form-group" style="margin-bottom:25px">
                 <label for="email" style="font-size:13px">EMAIL:</label>
                 <input type="text" name="email" class="form-control" id="email" placeholder="Enter your email">
@@ -12,7 +12,9 @@
                 <label for="password" style="font-size:13px">PASSWORD:</label>
                 <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password">
         </div>
-        <div class="form-group">
+    </form>
+    <div class="button">
+        <form action="/" method="GET">
             <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn btn-outline-dark btn-lg" name = "button" value="login">
                 <b>Submit</b>
             </button>
