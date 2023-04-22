@@ -42,8 +42,6 @@ def login():
     if "user" in session:
         return redirect("/")
     if request.method == "POST":
-        if "create_user" in request.form:
-            return redirect("/signup")
         email = request.form.get("email")
         password = request.form.get("password")
         Authentication.login(email, password)
@@ -99,11 +97,6 @@ def view_profiles():
 @Authentication.login_required
 def add_cat():
     return render_template("add_cat.html")
-
-
-@app.route("/signup", methods=["GET", "POST"])
-def signup():
-    return render_template("signup.html")
 
 @app.route("/", methods=("GET", "POST"))
 @Authentication.login_required
