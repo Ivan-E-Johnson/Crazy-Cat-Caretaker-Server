@@ -10,8 +10,8 @@ class Camera(object):
         if video_key in Camera.feeds:
             del Camera.feeds[video_key]
 
-    def __init__(self):
-        self.feed_key = "TESTFEEDKEY"
+    def __init__(self, feed_key):
+        self.feed_key = feed_key
 
     def get_frame(self):
         return (

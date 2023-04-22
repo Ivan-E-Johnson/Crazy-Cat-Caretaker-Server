@@ -1,7 +1,11 @@
 import time
+<<<<<<< HEAD
 
 import smtplib
 from email.mime.text import MIMEText
+=======
+from typing import List
+>>>>>>> 165a4ee (Teachable machine is working.)
 
 from flask import (
     Flask,
@@ -21,6 +25,7 @@ from flask_sse import sse
 from redis import Redis
 import pyrebase
 import Authentication
+from Home import Users, House, Cats, HomeEvents
 
 #### VERY IMPORTANT
 ## FIXES BUG BETWEEN GUINICORN AND FIRESTORE
@@ -42,7 +47,7 @@ Session(app)
 
 status = {}
 settings = {
-    "classify_period": 5
+    "classify_period": 1
 }
 
 @app.route("/login", methods=["GET", "POST"])
@@ -128,23 +133,32 @@ def landing_page():
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    mac_address = "TESTFEEDKEY"
+    mac_address = "123445677" # TODO CHANGE ME
     file = request.files["media"]
     # filename = file.filename
     image = file.read()
     Camera.feeds[mac_address] = image
     sse.publish({"started": True}, type=mac_address)
-    # sse.publish({"message": "Hello!!"}, type='greeting')
-    # print("message sent. done")
 
     last_classified = status.get(mac_address, {}).get("last_classified", None)
     if last_classified is None or last_classified + settings["classify_period"] < time.time():
         if mac_address not in status:
             status[mac_address] = {}
         status[mac_address]["last_classified"] = 0
-        print(teachable_machine.classify(image))
+        cat_class, probability = teachable_machine.classify(image)
         status[mac_address]["last_classified"] = time.time()
-
+        if cat_class != teachable_machine.NO_CAT:
+            cat_house: House = House.get(mac_address)
+            cats: List[Cats] = cat_house.cats
+            cat = None
+            for house_cat in cats:
+                if house_cat.name == cat_class:
+                    print("CAT FOUND", house_cat.name)
+                    cat = house_cat
+                    cat.name = "TESTSTETST"
+                    print(cat)
+            assert cat is not None # Should handle this better but we are making some assumptions for now
+            print(cat_house)
 
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
@@ -158,9 +172,8 @@ def stream():
     return "Success"
 
 
-def gen(camera):
+def gen(camera: Camera):
     while True:
-        video_key = "TESTFEEDKEY"
         frame = camera.get_frame()
         yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
@@ -169,7 +182,8 @@ def gen(camera):
 @Authentication.login_required
 def video_feed():
     print("here")
-    return Response(gen(Camera()), mimetype="multipart/x-mixed-replace; boundary=frame")
+    video_key = session["mac_address"]
+    return Response(gen(Camera(video_key)), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 def email(subject, body, sender, recipients, password):
@@ -193,6 +207,3 @@ def send_email():
 
     print("hello!")
     return email(subject, body, sender, recipients, password)
-
-
-
