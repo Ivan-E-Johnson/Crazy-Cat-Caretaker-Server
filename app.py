@@ -40,6 +40,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.register_blueprint(sse, url_prefix="/stream")  # For sse events
 Session(app)
 
+status = {}
+settings = {
+    "classify_period": 5
+}
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -124,15 +128,23 @@ def landing_page():
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    video_key = "TESTFEEDKEY"
+    mac_address = "TESTFEEDKEY"
     file = request.files["media"]
     # filename = file.filename
     image = file.read()
-    Camera.feeds[video_key] = image
-    sse.publish({"started": True}, type=video_key)
+    Camera.feeds[mac_address] = image
+    sse.publish({"started": True}, type=mac_address)
     # sse.publish({"message": "Hello!!"}, type='greeting')
     # print("message sent. done")
-    print(teachable_machine.classify(image))
+
+    last_classified = status.get(mac_address, {}).get("last_classified", None)
+    if last_classified is None or last_classified + settings["classify_period"] < time.time():
+        if mac_address not in status:
+            status[mac_address] = {}
+        status[mac_address]["last_classified"] = 0
+        print(teachable_machine.classify(image))
+        status[mac_address]["last_classified"] = time.time()
+
 
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
