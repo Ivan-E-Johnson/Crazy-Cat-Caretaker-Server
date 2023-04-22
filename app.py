@@ -132,7 +132,7 @@ def upload_file():
     sse.publish({"started": True}, type=video_key)
     # sse.publish({"message": "Hello!!"}, type='greeting')
     # print("message sent. done")
-    # print(teachable_machine.classify(image))
+    print(teachable_machine.classify(image))
 
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
