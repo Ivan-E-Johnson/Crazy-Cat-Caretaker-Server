@@ -4,19 +4,24 @@ from firebase_admin import credentials
 from Home import *
 
 new_cat = Cats("New Cat", 123, 3)
-house: House = House.get("123445677")
+house: House = House.get("12345")
 house.events.laser_state = True
 print(house)
 house.create()
 
-# cat1 = Cat(id="Test_ID", name="KITTY", max_food=1, daily_food=0.4)
-# cat2 = Cat(id="Test_ID2", name="KITTY2", max_food=1, daily_food=0.4)
-# user1 = Users(id="test_usr", name="test_usr")
-# user2 = Users(id="test_usr", name="test_usr2")
-# userList = [user1, user2]
-# catList = [cat1, cat2]
+# cat1 = Cats( name="KITTY", max_food=1, daily_food=0.4)
+# cat2 = Cats( name="KITTY2", max_food=1, daily_food=0.4)
+# events = HomeEvents(laser_state="1",laser_changed=False, dispense_amount=10, dispense_changed=False)
 #
-# newHome = House(mac_address="12345", users=userList, cats=catList)
+# # user1 = Users(id="test_usr", name="test_usr")
+# # user2 = Users(id="test_usr", name="test_usr2")
+# # userList = [user1, user2]
+# catList = [cat1, cat2, new_cat]
+#
+# newHome = House(mac_address="12345", cats=catList, events=events)
+# newHome.create()
+
+
 # cred = credentials.Certificate(
 #     "testingccc-3b63d-firebase-adminsdk-vyn5d-3c9e0df96a.json"
 # )

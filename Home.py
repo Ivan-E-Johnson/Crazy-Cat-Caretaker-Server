@@ -96,7 +96,6 @@ class House(DatabaseObject):
     def add_cat(self, cat):
         self.cats.append(cat)
 
-
 class Cats(DatabaseObject):
     ref = None # Cats should be added to a house not to the db directly
     pk = None # Cats should be added to a house not to the db directly
@@ -111,11 +110,12 @@ class Cats(DatabaseObject):
 class HomeEvents(DatabaseObject):
     ref = None  # Events should be added to a house not to the db directly
     pk = None  # Events should be added to a house not to the db directly
-    attrs = ["laser_state", "dispense", "video"]
+    attrs = ["laser_state","laser_changed", "dispense_amount","dispense_changed"]
 
-    def __init__(self, laser_state, dispense, video):
+    def __init__(self, laser_state,laser_changed, dispense_amount, dispense_changed):
         self.laser_state = laser_state
-        self.dispense = dispense
-        self.video = video
+        self.laser_changed = laser_changed
+        self.dispense_amount = dispense_amount
+        self.dispense_changed = dispense_changed
 
 
