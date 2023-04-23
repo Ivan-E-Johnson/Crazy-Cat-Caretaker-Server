@@ -13,4 +13,40 @@
 {% block content %}
     <h1>Existing Cat Profiles Here</h1>
 
+
+<style>
+.scrollable-list {
+  height: 200px;
+  overflow-y: scroll;
+}
+</style>
+
+<div class="container">
+    <div  class="scrollable-list">
+        <table class="table" style="max-height:5vh;">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">Cat's Name</th>
+                  <th scope="col">Current Food</th>
+                    <th scope="col">Max Daily Food</th>
+                    <th scope="col">Number of Visits</th>
+                    <th scope="col">Present</th>
+                </tr>
+              </thead>
+            <tbody>
+            {% for cat in cats %}
+                <tr>
+                  <td>{{cat.name}}</td>
+                  <td>{{cat.daily_food}}</td>
+                    <td>{{cat.max_food}}</td>
+                  <td>{{cat.number_of_visits}}</td>
+                  <td>{{cat.present}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+</div>
+
+
 {% endblock %}

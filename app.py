@@ -143,10 +143,44 @@ def laser_off():
     return redirect('/playing')
 
 
-@app.route("/feeding")
+@app.route("/feeding", methods=["GET", "POST"])
 @Authentication.login_required
 def feeding():
-    return render_template("feeding.html")
+    if request.method == 'POST':
+        print(request.form)
+        cat_name = request.form.get("pick_cat")
+        food_amount = request.form.get("pick_amount")
+        house = House.get(session["mac_address"])
+
+        cats: List[Cats] = house.cats
+        cat = None
+        for house_cat in cats:
+            if house_cat.name == cat_name:
+                print("CAT FOUND", house_cat.name)
+                cat = house_cat
+        assert cat is not None  # Should handle this better but we are making some assumptions for now
+
+        print("CAT FED", cat.name)
+        food_amount = int(food_amount)
+        message = f"{cat.name} has been manually fed {food_amount} units of food!"
+        house.add_notification(Notifications(message, time.time()))
+        flash(message)
+        users = get_users_emails_from_house(house)
+        date_time = datetime.fromtimestamp(time.time())
+        str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+        email(f"Cat feeding at {str_time}", message, users)
+        house.events.dispense_amount = food_amount
+        house.events.dispense_changed = True
+        cat.daily_food = cat.daily_food + food_amount
+        cat.last_fed = time.time()
+        house.create()
+
+        return redirect("/feeding")
+    else:
+        house = House.get(session["mac_address"])
+        cats: List[Cats] = house.cats
+        cat_names = [cat.name for cat in cats]
+        return render_template("feeding.html", cat_names=cat_names)
 
 
 @app.route("/playing", methods=["GET", "POST"])
@@ -156,18 +190,6 @@ def playing():
     return render_template(
         "playing.html", video_key=video_key, started=video_key in Camera.feeds
     )
-
-
-@app.route("/view_profiles", methods=["GET", "POST"])
-@Authentication.login_required
-def view_profiles():
-    return render_template("view_profiles.html")
-
-
-@app.route("/add_cat", methods=["GET", "POST"])
-@Authentication.login_required
-def add_cat():
-    return render_template("add_cat.html")
 
 
 @app.route("/", methods=("GET", "POST"))
@@ -287,6 +309,7 @@ def clear_notifications():
 
     return redirect("/")
 
+
 def gen(camera: Camera):
     while True:
         frame = camera.get_frame()
@@ -320,6 +343,7 @@ def email(subject, body, recipients, image=None):
     smtp_server.sendmail("crazycatcaretaker123@gmail.com", recipients, message.as_string())
     smtp_server.quit()
 
+
 @app.route("/send_email", methods=["GET", "POST"])
 def send_email():
     subject = "Test"
@@ -328,3 +352,27 @@ def send_email():
 
     print("hello!")
     return email(subject, body, recipients)
+
+
+@app.route("/view_profiles", methods=["GET"])
+@Authentication.login_required
+def cat_profiles():
+    house: House = House.get(session["mac_address"])
+    return render_template("view_profiles.html", cats=house.cats)
+
+
+@app.route("/add_cat", methods=["GET", "POST"])
+@Authentication.login_required
+def add_cat():
+    house: House = House.get(session["mac_address"])
+    print(house.cats)
+    if request.method == 'POST':
+        cat_name = request.form.get("cat-name")
+        max_food = request.form.get("max-food")
+        new_cat = Cats(cat_name, max_food, 0, 0, 0, 0, 0, False)
+        house.add_cat(new_cat)
+        house.create()
+        flash(f"Cat {new_cat} added to your home")
+        return redirect("/view_profiles")
+    else:
+        return render_template("add_cat.html")
