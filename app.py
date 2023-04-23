@@ -26,6 +26,8 @@ from redis import Redis
 import pyrebase
 import Authentication
 from Home import Users, House, Cats, HomeEvents
+import time
+from datetime import datetime
 
 #### VERY IMPORTANT
 ## FIXES BUG BETWEEN GUINICORN AND FIRESTORE
@@ -97,7 +99,7 @@ def feeding():
 @app.route("/playing", methods=["GET", "POST"])
 @Authentication.login_required
 def playing():
-    video_key = "TESTFEEDKEY"
+    video_key = "123445677"
     return render_template(
         "playing.html", video_key=video_key, started=video_key in Camera.feeds
     )
@@ -155,10 +157,44 @@ def upload_file():
                 if house_cat.name == cat_class:
                     print("CAT FOUND", house_cat.name)
                     cat = house_cat
-                    cat.name = "TESTSTETST"
-                    print(cat)
-            assert cat is not None # Should handle this better but we are making some assumptions for now
-            print(cat_house)
+            assert cat is not None  # Should handle this better but we are making some assumptions for now
+            TWENTY_FOUR_HOURS = 86400  # seconds in 24 hours
+            ONE_MINUTE = 60
+
+            if not cat.present and float(cat.last_visit) + ONE_MINUTE < time.time():
+                print("CAT VISITED", cat.name)
+                cat.number_of_visits += 1
+                timestamp = time.time()
+                # date_time = datetime.fromtimestamp(timestamp)
+                # str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+                cat.last_visit = timestamp
+
+            cat.present = True
+
+            if time.time() > float(cat.first_fed) + TWENTY_FOUR_HOURS:
+                print("CAT FOOD RESET", cat.name)
+                cat.daily_food = 0
+                cat.first_fed = time.time()
+
+            current_food_amount = cat.daily_food
+            max_food_amount = cat.max_food
+            if current_food_amount < max_food_amount and float(cat.last_fed) + Cats.FOOD_FREQUENCY < time.time():
+                print("CAT FED", cat.name)
+                food_amount = min(Cats.DISPENSE_AMOUNT, max_food_amount - current_food_amount)
+                cat_house.events.dispense_amount = food_amount
+                cat_house.events.dispense_changed = True
+                cat.daily_food = current_food_amount + food_amount
+                cat.last_fed = time.time()
+
+
+            cat_house.create()
+        else:
+            # Set all cats to not present
+            cat_house: House = House.get(mac_address)
+            cats: List[Cats] = cat_house.cats
+            for house_cat in cats:
+                house_cat.present = False
+            cat_house.create()
 
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
@@ -181,7 +217,6 @@ def gen(camera: Camera):
 @app.route("/video_feed")
 @Authentication.login_required
 def video_feed():
-    print("here")
     video_key = session["mac_address"]
     return Response(gen(Camera(video_key)), mimetype="multipart/x-mixed-replace; boundary=frame")
 

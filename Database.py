@@ -3,11 +3,8 @@ from firebase_admin import firestore
 from firebase_admin import credentials
 from Home import *
 
-new_cat = Cats("New Cat", 123, 3)
-house: House = House.get("12345")
-house.events.laser_state = True
+house: House = House.get("123445677")
 print(house)
-house.create()
 
 # cat1 = Cats( name="KITTY", max_food=1, daily_food=0.4)
 # cat2 = Cats( name="KITTY2", max_food=1, daily_food=0.4)
