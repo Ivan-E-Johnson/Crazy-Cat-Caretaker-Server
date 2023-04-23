@@ -1,4 +1,8 @@
 import time
+
+import smtplib
+from email.mime.text import MIMEText
+
 from flask import (
     Flask,
     render_template,
@@ -154,3 +158,29 @@ def gen(camera):
 def video_feed():
     print("here")
     return Response(gen(Camera()), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+
+def email(subject, body, sender, recipients, password):
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = ', '.join(recipients)
+    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    smtp_server.login(sender, password)
+    smtp_server.sendmail(sender, recipients, msg.as_string())
+    smtp_server.quit()
+
+
+@app.route("/send_email", methods=["GET", "POST"])
+def send_email():
+    subject = "Test"
+    body = "This is a test"
+    sender = "crazycatcaretaker123@gmail.com"
+    recipients = ["crazycatcaretaker123@gmail.com"]
+    password = "wklhkcqzccnkgsvr"
+
+    print("hello!")
+    return email(subject, body, sender, recipients, password)
+
+
+
