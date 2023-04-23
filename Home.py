@@ -1,3 +1,5 @@
+from typing import List
+
 from firebase_admin import firestore, credentials, initialize_app
 
 cred = credentials.Certificate(
@@ -8,6 +10,7 @@ app = initialize_app(cred)
 db = firestore.client()
 
 home_ref = db.collection("Home")
+
 
 class DatabaseObject():
     ref = db
@@ -40,7 +43,7 @@ class DatabaseObject():
 
     @staticmethod
     def _from_dict(cls, source):
-        if source is None:
+        if source is None or source == [] or source == {}:
             return None
         args = []
         for arg in cls.attrs:
@@ -77,12 +80,13 @@ class Users(DatabaseObject):
 class House(DatabaseObject):
     ref = db.collection("Home")
     pk = "mac_address"
-    attrs = ["mac_address", "cats", "events"]
+    attrs = ["mac_address", "cats", "events", "notifications"]
 
-    def __init__(self, mac_address, cats, events):
+    def __init__(self, mac_address, cats, events, notifications):
         self.mac_address = mac_address
-        self.cats = cats
-        self.events = events
+        self.cats: List[Cats] = cats
+        self.events: HomeEvents = events
+        self.notifications: List[Notifications] = notifications
 
     @classmethod
     def from_dict(cls, source):
@@ -90,32 +94,57 @@ class House(DatabaseObject):
         if new_class is None:
             return None
         new_class._transform_attrs("cats", Cats, new_class.cats)
+        new_class._transform_attrs("notifications", Notifications, new_class.notifications)
         new_class._transform_attr("events", HomeEvents, new_class.events)
         return new_class
 
     def add_cat(self, cat):
         self.cats.append(cat)
 
+    def add_notification(self, notification):
+        self.notifications.append(notification)
 
-class Cats(DatabaseObject):
+    def clear_notifications(self):
+        self.notifications = []
+
+
+class Notifications(DatabaseObject):
     ref = None # Cats should be added to a house not to the db directly
     pk = None # Cats should be added to a house not to the db directly
-    attrs = ["name", "max_food", "daily_food"]
+    attrs = ["message", "time"]
 
-    def __init__(self, name, max_food, daily_food):
+    def __init__(self, message, time):
+        self.message = message
+        self.time = time
+
+
+class Cats(DatabaseObject):
+    DISPENSE_AMOUNT = 2.5 # dispense 2.5 units of food per feeding
+    FOOD_FREQUENCY = 120 # May feed cats every 2 mins if still present
+    ref = None # Cats should be added to a house not to the db directly
+    pk = None # Cats should be added to a house not to the db directly
+    attrs = ["name", "max_food", "daily_food", "number_of_visits", "last_visit", "first_fed", "last_fed", "present"]
+
+    def __init__(self, name, max_food, daily_food, number_of_visits, last_visit, first_fed, last_fed, present):
         self.name = name
         self.max_food = max_food
         self.daily_food = daily_food
+        self.number_of_visits = number_of_visits
+        self.last_visit = last_visit
+        self.first_fed = first_fed
+        self.last_fed = last_fed
+        self.present = present
 
 
 class HomeEvents(DatabaseObject):
     ref = None  # Events should be added to a house not to the db directly
     pk = None  # Events should be added to a house not to the db directly
-    attrs = ["laser_state", "dispense", "video"]
+    attrs = ["laser_state","laser_changed", "dispense_amount","dispense_changed"]
 
-    def __init__(self, laser_state, dispense, video):
+    def __init__(self, laser_state,laser_changed, dispense_amount, dispense_changed):
         self.laser_state = laser_state
-        self.dispense = dispense
-        self.video = video
+        self.laser_changed = laser_changed
+        self.dispense_amount = dispense_amount
+        self.dispense_changed = dispense_changed
 
 

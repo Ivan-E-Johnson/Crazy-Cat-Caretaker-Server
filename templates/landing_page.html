@@ -26,29 +26,41 @@
     INTERACTION HISTORY:
 </div>
 
-<div style="border:solid; border-color:#203354; margin-bottom:40px">
-    <div style="font-size:12px;" class="scrollable-list">
-  <ul>
-    <li>Item 1</li>
-    <li>Item 2</li>
-    <li>Item 3</li>
-    <li>Item 4</li>
-    <li>Item 5</li>
-    <li>Item 6</li>
-    <li>Item 7</li>
-    <li>Item 8</li>
-    <li>Item 9</li>
-    <li>Item 10</li>
-  </ul>
-</div>
-
 <style>
 .scrollable-list {
-  height: 125px;
+  height: 200px;
   overflow-y: scroll;
 }
 </style>
 
+<div class="container">
+    <div  class="scrollable-list">
+        <table class="table" style="max-height:5vh;">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">Message</th>
+                  <th scope="col">Timestamp</th>
+                </tr>
+              </thead>
+            <tbody>
+            {% for note in notifications %}
+                <tr>
+                  <td>{{note.message}}</td>
+                  <td>{{note.time}}</td>
+                </tr>
+            {% endfor %}
+                <tr>
+                  <td>
+                      <form action="/clear_notifications" method="POST">
+                        <button style="background-color:#5FCFEC; font-size:16px;" class="centered-button" type="submit" name = "view_profiles" value="clicked">
+                            <b>Clear Notifications</b>
+                        </button>
+                      </form>
+                  </td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
 </div>
 
 <!--Button to view existing cat profiles-->

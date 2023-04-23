@@ -1,7 +1,9 @@
 import time
-
 import smtplib
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import List
 
 from flask import (
     Flask,
@@ -21,6 +23,9 @@ from flask_sse import sse
 from redis import Redis
 import pyrebase
 import Authentication
+from Home import Users, House, Cats, HomeEvents, Notifications
+import time
+from datetime import datetime
 
 #### VERY IMPORTANT
 ## FIXES BUG BETWEEN GUINICORN AND FIRESTORE
@@ -40,6 +45,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.register_blueprint(sse, url_prefix="/stream")  # For sse events
 Session(app)
 
+status = {}
+settings = {
+    "classify_period": 1
+}
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -88,7 +97,7 @@ def feeding():
 @app.route("/playing", methods=["GET", "POST"])
 @Authentication.login_required
 def playing():
-    video_key = "TESTFEEDKEY"
+    video_key = "123445677"
     return render_template(
         "playing.html", video_key=video_key, started=video_key in Camera.feeds
     )
@@ -119,25 +128,94 @@ def landing_page():
     #     if request.form["playing_button"] == "clicked":
     #         flash("TODO: Laser pointer control page")
     #         return render_template("playing.html")
-    return render_template("landing_page.html")
+    notifications = House.get(session["mac_address"]).notifications
+    return render_template("landing_page.html", notifications=notifications)
 
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    video_key = "TESTFEEDKEY"
+    mac_address = "123445677" # TODO CHANGE ME
     file = request.files["media"]
     # filename = file.filename
     image = file.read()
-    Camera.feeds[video_key] = image
-    sse.publish({"started": True}, type=video_key)
-    # sse.publish({"message": "Hello!!"}, type='greeting')
-    # print("message sent. done")
-    # print(teachable_machine.classify(image))
+    Camera.feeds[mac_address] = image
+    sse.publish({"started": True}, type=mac_address)
+
+    last_classified = status.get(mac_address, {}).get("last_classified", None)
+    if last_classified is None or last_classified + settings["classify_period"] < time.time():
+        if mac_address not in status:
+            status[mac_address] = {}
+        status[mac_address]["last_classified"] = 0
+        cat_class, probability = teachable_machine.classify(image)
+        status[mac_address]["last_classified"] = time.time()
+        if cat_class != teachable_machine.NO_CAT:
+            cat_house: House = House.get(mac_address)
+            cats: List[Cats] = cat_house.cats
+            cat = None
+            for house_cat in cats:
+                if house_cat.name == cat_class:
+                    print("CAT FOUND", house_cat.name)
+                    cat = house_cat
+            assert cat is not None  # Should handle this better but we are making some assumptions for now
+            TWENTY_FOUR_HOURS = 86400  # seconds in 24 hours
+            ONE_MINUTE = 60
+
+            if not cat.present and float(cat.last_visit) + ONE_MINUTE < time.time():
+                cat_house.add_notification(Notifications(f"{cat.name} says hi!", time.time()))
+                print("CAT VISITED", cat.name)
+                cat.number_of_visits += 1
+                timestamp = time.time()
+                # date_time = datetime.fromtimestamp(timestamp)
+                # str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+                cat.last_visit = timestamp
+
+            cat.present = True
+
+            if time.time() > float(cat.first_fed) + TWENTY_FOUR_HOURS:
+                print("CAT FOOD RESET", cat.name)
+                cat.daily_food = 0
+                cat.first_fed = time.time()
+
+            current_food_amount = cat.daily_food
+            max_food_amount = cat.max_food
+            if current_food_amount < max_food_amount and float(cat.last_fed) + Cats.FOOD_FREQUENCY < time.time():
+                print("CAT FED", cat.name)
+                food_amount = min(Cats.DISPENSE_AMOUNT, max_food_amount - current_food_amount)
+                cat_house.add_notification(Notifications(f"{cat.name} has been fed {food_amount} units of food!", time.time()))
+                users = get_users_emails_from_house(cat_house)
+                date_time = datetime.fromtimestamp(timestamp)
+                str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+                email(f"Cat feeding at {str_time}", f"{cat.name} has been fed {food_amount} units of food.", users, image=image)
+                cat_house.events.dispense_amount = food_amount
+                cat_house.events.dispense_changed = True
+                cat.daily_food = current_food_amount + food_amount
+                cat.last_fed = time.time()
+
+
+            cat_house.create()
+        else:
+            # Set all cats to not present
+            cat_house: House = House.get(mac_address)
+            cats: List[Cats] = cat_house.cats
+            for house_cat in cats:
+                house_cat.present = False
+            cat_house.create()
 
     # We cannot save files directly after reading them or vice versa
     # file.save(filename)
     return "Success"
 
+# A very poor way of getting the users associated with a house
+def get_users_emails_from_house(house: House):
+    mac_address = house.mac_address
+    house_user_emails = []
+    all_users = Users.ref.get()
+    for user in all_users:
+        user = user.to_dict()
+        if user["mac_address"] == mac_address:
+            house_user_emails.append(user["email"])
+
+    return house_user_emails
 
 @app.route("/stream", methods=["POST"])
 @Authentication.login_required
@@ -145,10 +223,17 @@ def stream():
     # TODO
     return "Success"
 
+@app.route("/clear_notifications", methods=["POST"])
+@Authentication.login_required
+def clear_notifications():
+    house = House.get(session["mac_address"])
+    house.clear_notifications()
+    house.create()
 
-def gen(camera):
+    return redirect("/")
+
+def gen(camera: Camera):
     while True:
-        video_key = "TESTFEEDKEY"
         frame = camera.get_frame()
         yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
@@ -156,31 +241,35 @@ def gen(camera):
 @app.route("/video_feed")
 @Authentication.login_required
 def video_feed():
-    print("here")
-    return Response(gen(Camera()), mimetype="multipart/x-mixed-replace; boundary=frame")
+    video_key = session["mac_address"]
+    return Response(gen(Camera(video_key)), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
-def email(subject, body, sender, recipients, password):
-    msg = MIMEText(body)
-    msg['Subject'] = subject
-    msg['From'] = sender
-    msg['To'] = ', '.join(recipients)
+def email(subject, body, recipients, image=None):
+    if image is not None:
+        message = MIMEMultipart()
+        message['Subject'] = subject
+        message['From'] = "crazycatcaretaker123@gmail.com"
+        message['To'] = ', '.join(recipients)
+        html_part = MIMEText(body)
+        message.attach(html_part)
+        message.attach(MIMEImage(image))
+    else:
+        message = MIMEText(body)
+        message['Subject'] = subject
+        message['From'] = "crazycatcaretaker123@gmail.com"
+        message['To'] = ', '.join(recipients)
+
     smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    smtp_server.login(sender, password)
-    smtp_server.sendmail(sender, recipients, msg.as_string())
+    smtp_server.login("crazycatcaretaker123@gmail.com", "wklhkcqzccnkgsvr")
+    smtp_server.sendmail("crazycatcaretaker123@gmail.com", recipients, message.as_string())
     smtp_server.quit()
-
 
 @app.route("/send_email", methods=["GET", "POST"])
 def send_email():
     subject = "Test"
     body = "This is a test"
-    sender = "crazycatcaretaker123@gmail.com"
     recipients = ["crazycatcaretaker123@gmail.com"]
-    password = "wklhkcqzccnkgsvr"
 
     print("hello!")
-    return email(subject, body, sender, recipients, password)
-
-
-
+    return email(subject, body, recipients)
