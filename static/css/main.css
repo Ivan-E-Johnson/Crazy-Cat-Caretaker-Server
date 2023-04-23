@@ -83,3 +83,19 @@ margin: auto;
     float:right;
     margin-right: 63px;
 }
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 95%;
+}
+
+.button-container button {
+    flex-basis: 100%;
+}
+
+.max-width {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}

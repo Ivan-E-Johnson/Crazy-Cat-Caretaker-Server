@@ -88,6 +88,61 @@ def logout():
     return redirect("/")
 
 
+@app.route("/laser_up_down")
+@Authentication.login_required
+def laser_up_down():
+    house: House = House.get(session["mac_address"])
+    house.events.laser_state = "up_down"
+    house.events.laser_changed = True
+    house.create()
+    flash("Laser state updated")
+    return redirect('/playing')
+
+
+@app.route("/laser_side_side")
+@Authentication.login_required
+def laser_side_side():
+    house: House = House.get(session["mac_address"])
+    house.events.laser_state = "side_side"
+    house.events.laser_changed = True
+    house.create()
+    flash("Laser state updated")
+    return redirect('/playing')
+
+
+@app.route("/laser_circle")
+@Authentication.login_required
+def laser_circle():
+    house: House = House.get(session["mac_address"])
+    house.events.laser_state = "circle"
+    house.events.laser_changed = True
+    house.create()
+    flash(f"Laser state updated")
+    return redirect('/playing')
+
+
+@app.route("/laser_random")
+@Authentication.login_required
+def laser_random():
+    house: House = House.get(session["mac_address"])
+    house.events.laser_state = "random"
+    house.events.laser_changed = True
+    house.create()
+    flash(f"Laser state updated")
+    return redirect('/playing')
+
+
+@app.route("/laser_off")
+@Authentication.login_required
+def laser_off():
+    house: House = House.get(session["mac_address"])
+    house.events.laser_state = "off"
+    house.events.laser_changed = True
+    house.create()
+    flash(f"Laser state updated")
+    return redirect('/playing')
+
+
 @app.route("/feeding")
 @Authentication.login_required
 def feeding():
