@@ -192,18 +192,6 @@ def playing():
     )
 
 
-@app.route("/view_profiles", methods=["GET", "POST"])
-@Authentication.login_required
-def view_profiles():
-    return render_template("view_profiles.html")
-
-
-@app.route("/add_cat", methods=["GET", "POST"])
-@Authentication.login_required
-def add_cat():
-    return render_template("add_cat.html")
-
-
 @app.route("/", methods=("GET", "POST"))
 @Authentication.login_required
 def landing_page():
@@ -355,6 +343,7 @@ def email(subject, body, recipients, image=None):
     smtp_server.sendmail("crazycatcaretaker123@gmail.com", recipients, message.as_string())
     smtp_server.quit()
 
+
 @app.route("/send_email", methods=["GET", "POST"])
 def send_email():
     subject = "Test"
@@ -363,3 +352,27 @@ def send_email():
 
     print("hello!")
     return email(subject, body, recipients)
+
+
+@app.route("/view_profiles", methods=["GET"])
+@Authentication.login_required
+def cat_profiles():
+    house: House = House.get(session["mac_address"])
+    return render_template("view_profiles.html", cats=house.cats)
+
+
+@app.route("/add_cat", methods=["GET", "POST"])
+@Authentication.login_required
+def add_cat():
+    house: House = House.get(session["mac_address"])
+    print(house.cats)
+    if request.method == 'POST':
+        cat_name = request.form.get("cat-name")
+        max_food = request.form.get("max-food")
+        new_cat = Cats(cat_name, max_food, 0, 0, 0, 0, 0, False)
+        house.add_cat(new_cat)
+        house.create()
+        flash(f"Cat {new_cat} added to your home")
+        return redirect("/view_profiles")
+    else:
+        return render_template("add_cat.html")
