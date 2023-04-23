@@ -87,7 +87,7 @@ margin: auto;
 .button-container {
     display: flex;
     justify-content: space-between;
-    width: 95%;
+    width: 85%;
 }
 
 .button-container button {
@@ -98,4 +98,13 @@ margin: auto;
     max-width: 800px;
     width: 100%;
     margin: 0 auto;
+}
+
+.outline {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+.outline th, .outline td {
+  border: 1px solid black;
+  padding: 8px;
 }

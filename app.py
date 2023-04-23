@@ -50,6 +50,7 @@ settings = {
     "classify_period": 1
 }
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if "user" in session:
@@ -166,8 +167,11 @@ def feeding():
         house.add_notification(Notifications(message, time.time()))
         flash(message)
         users = get_users_emails_from_house(house)
+
         date_time = datetime.fromtimestamp(time.time())
+        print("here:" + str(date_time))
         str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+
         email(f"Cat feeding at {str_time}", message, users)
         house.events.dispense_amount = food_amount
         house.events.dispense_changed = True
@@ -205,12 +209,15 @@ def landing_page():
     #     if request.form["playing_button"] == "clicked":
     #         flash("TODO: Laser pointer control page")
     #         return render_template("playing.html")
+
     notifications = House.get(session["mac_address"]).notifications
+    notifications = [(n.message, datetime.fromtimestamp(n.time).strftime("%H:%M - %B %d, %Y")) for n in notifications]
     return render_template("landing_page.html", notifications=notifications)
 
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
+    global timestamp
     mac_address = "123445677" # TODO CHANGE ME
     file = request.files["media"]
     # filename = file.filename
@@ -237,14 +244,15 @@ def upload_file():
             TWENTY_FOUR_HOURS = 86400  # seconds in 24 hours
             ONE_MINUTE = 60
 
+
             if not cat.present and float(cat.last_visit) + ONE_MINUTE < time.time():
                 cat_house.add_notification(Notifications(f"{cat.name} says hi!", time.time()))
                 print("CAT VISITED", cat.name)
                 cat.number_of_visits += 1
                 timestamp = time.time()
-                # date_time = datetime.fromtimestamp(timestamp)
-                # str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
-                cat.last_visit = timestamp
+                date_time = datetime.fromtimestamp(timestamp)
+                str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+                cat.last_visit = str_time
 
             cat.present = True
 
@@ -282,6 +290,7 @@ def upload_file():
     # file.save(filename)
     return "Success"
 
+
 # A very poor way of getting the users associated with a house
 def get_users_emails_from_house(house: House):
     mac_address = house.mac_address
@@ -294,11 +303,13 @@ def get_users_emails_from_house(house: House):
 
     return house_user_emails
 
+
 @app.route("/stream", methods=["POST"])
 @Authentication.login_required
 def stream():
     # TODO
     return "Success"
+
 
 @app.route("/clear_notifications", methods=["POST"])
 @Authentication.login_required
