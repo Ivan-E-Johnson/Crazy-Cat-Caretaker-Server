@@ -148,7 +148,6 @@ def laser_off():
 @Authentication.login_required
 def feeding():
     if request.method == 'POST':
-        print(request.form)
         cat_name = request.form.get("pick_cat")
         food_amount = request.form.get("pick_amount")
         house = House.get(session["mac_address"])
@@ -169,7 +168,6 @@ def feeding():
         users = get_users_emails_from_house(house)
 
         date_time = datetime.fromtimestamp(time.time())
-        print("here:" + str(date_time))
         str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
 
         email(f"Cat feeding at {str_time}", message, users)
@@ -190,7 +188,7 @@ def feeding():
 @app.route("/playing", methods=["GET", "POST"])
 @Authentication.login_required
 def playing():
-    video_key = "123445677"
+    video_key = session["mac_address"]
     return render_template(
         "playing.html", video_key=video_key, started=video_key in Camera.feeds
     )
@@ -218,7 +216,8 @@ def landing_page():
 @app.route("/upload", methods=["POST"])
 def upload_file():
     global timestamp
-    mac_address = "123445677" # TODO CHANGE ME
+    mac_address = request.values.get('mac_address')
+
     file = request.files["media"]
     # filename = file.filename
     image = file.read()
@@ -361,7 +360,6 @@ def send_email():
     body = "This is a test"
     recipients = ["crazycatcaretaker123@gmail.com"]
 
-    print("hello!")
     return email(subject, body, recipients)
 
 
@@ -376,7 +374,6 @@ def cat_profiles():
 @Authentication.login_required
 def add_cat():
     house: House = House.get(session["mac_address"])
-    print(house.cats)
     if request.method == 'POST':
         cat_name = request.form.get("cat-name")
         max_food = request.form.get("max-food")
@@ -387,3 +384,14 @@ def add_cat():
         return redirect("/view_profiles")
     else:
         return render_template("add_cat.html")
+
+
+@app.route("/register_device", methods=["POST"])
+def register_device():
+    mac_address = request.values.get("mac_address")
+    if House.get(mac_address) is None:
+        new_event = HomeEvents("OFF", False, 0, False)
+        new_home = House(mac_address, [], new_event, [])
+        new_home.create()
+        print(f"New device registered with mac address {mac_address}")
+    return "Success"

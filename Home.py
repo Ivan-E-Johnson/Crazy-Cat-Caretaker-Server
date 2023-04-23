@@ -25,6 +25,7 @@ class DatabaseObject():
         return self.__dict__[self.__class__.pk]
 
     def create(self):
+        print(self.to_dict())
         self.__class__.ref.document(self.primary_key()).set(self.to_dict())
 
     def _transform_attrs(self, name, attr_class, attr_list_of_dicts):
