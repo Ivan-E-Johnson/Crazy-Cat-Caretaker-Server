@@ -8,13 +8,10 @@
 
 <div class="button">
     <form method="GET" action="/feeding">
-        <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn-block" name = "feeding_button" value="clicked">
+        <button style="background-color:#5FCFEC;font-size:16px;margin-bottom:10px" type="submit" class="btn-block" name = "feeding_button" value="clicked">
             <b>FEED</b>
         </button>
     </form>
-    <p>
-
-    </p>
     <form method="GET" action="/playing">
         <button style="background-color:#5FCFEC; font-size:16px;" type="submit" class="btn-block" name = "playing_button" value="clicked">
             <b>PLAY</b>
@@ -22,7 +19,7 @@
     </form>
 </div>
 
-<div style = "font-size:15px; font-family: Times new Roman; margin-top:40px; margin-bottom:15px">
+<div style = "font-size:15px; font-family: Times new Roman; margin-top:20px; margin-bottom:12px">
     <b>INTERACTION HISTORY:</b>
 </div>
 
@@ -36,17 +33,17 @@
 <div class="container" style="margin-bottom:20px">
     <div  class="scrollable-list">
         <table class="table" style="max-height:5vh;">
-              <thead class="thead-dark">
+              <thead style="background-color:#f0e580;font-color:#000000" >
                 <tr>
-                  <th scope="col">Message</th>
-                  <th scope="col">Timestamp</th>
+                  <th style="font-size:13px" scope="col">MESSAGE</th>
+                  <th style="font-size:13px" scope="col">TIMESTAMP</th>
                 </tr>
               </thead>
             <tbody>
             {% for note in notifications %}
                 <tr>
-                  <td>{{note.message}}</td>
-                  <td>{{note.time}}</td>
+                  <td style="font-size:10px"><b>{{note[0]}}</b></td>
+                  <td style="font-size:10px"><b>{{note[1]}}</b></td>
                 </tr>
             {% endfor %}
                 <tr>
@@ -71,20 +68,16 @@
 <!--Button to add a new cat profile-->
 <div class="button;button-container">
     <form action="/view_profiles" method="GET">
-        <button style="background-color:#5FCFEC; font-size:16px;" class="centered-button" type="submit" name = "view_profiles" value="clicked">
+        <button style="background-color:#5FCFEC; font-size:16px;margin-bottom:10px" class="centered-button" type="submit" name = "view_profiles" value="clicked">
             <b>View Cat Profiles</b>
         </button>
     </form>
-    <p>
-
-    </p>
     <form action="/add_cat" method="GET">
         <button style="background-color:#5FCFEC; font-size:16px;" class="centered-button" type="submit" name = "add_cat" value="clicked">
             <b>Add Cat Profile</b>
         </button>
     </form>
 </div>
-
 <p>
 
 </p>
