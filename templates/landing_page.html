@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div style = "font-size:20px; font-family: Times new Roman; margin-bottom:15px"> INTERACT: </div>
+<!--<div style = "font-size:20px; font-family: Times new Roman; margin-bottom:15px"> INTERACT: </div>-->
 
 <div class="button">
     <form method="GET" action="/feeding">
@@ -23,17 +23,32 @@
 </div>
 
 <div style = "font-size:20px; font-family: Times new Roman; margin-top:40px; margin-bottom:15px">
-    PICTURES:
+    INTERACTION HISTORY:
 </div>
 
 <div style="border:solid; border-color:#203354; margin-bottom:40px">
-    <div style="font-size:10px;">[area for camera pics]</div>
-    <p>
-        &nbsp;
-    </p>
-    <p>
-        &nbsp;
-    </p>
+    <div style="font-size:12px;" class="scrollable-list">
+  <ul>
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+    <li>Item 4</li>
+    <li>Item 5</li>
+    <li>Item 6</li>
+    <li>Item 7</li>
+    <li>Item 8</li>
+    <li>Item 9</li>
+    <li>Item 10</li>
+  </ul>
+</div>
+
+<style>
+.scrollable-list {
+  height: 125px;
+  overflow-y: scroll;
+}
+</style>
+
 </div>
 
 <!--Button to view existing cat profiles-->

@@ -1,4 +1,8 @@
 import time
+
+import smtplib
+from email.mime.text import MIMEText
+
 from flask import (
     Flask,
     render_template,
@@ -49,6 +53,7 @@ def login():
     else:
         return render_template("login.html")
 
+
 @app.route("/signup", methods=("GET", "POST"))
 def signup():
     if "user" in session:
@@ -56,7 +61,7 @@ def signup():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-        mac_address  = request.form.get("mac_address")
+        mac_address = request.form.get("mac_address")
         success = Authentication.create_user(email, password, mac_address)
         if success:
             return redirect("/")
@@ -65,12 +70,14 @@ def signup():
     else:
         return render_template("signup.html")
 
+
 @app.route("/logout")
 @Authentication.login_required
 def logout():
     # TODO ADD logout button
     session.pop("user")
     return redirect("/")
+
 
 @app.route("/feeding")
 @Authentication.login_required
@@ -97,6 +104,7 @@ def view_profiles():
 @Authentication.login_required
 def add_cat():
     return render_template("add_cat.html")
+
 
 @app.route("/", methods=("GET", "POST"))
 @Authentication.login_required
@@ -150,3 +158,29 @@ def gen(camera):
 def video_feed():
     print("here")
     return Response(gen(Camera()), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+
+def email(subject, body, sender, recipients, password):
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = ', '.join(recipients)
+    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    smtp_server.login(sender, password)
+    smtp_server.sendmail(sender, recipients, msg.as_string())
+    smtp_server.quit()
+
+
+@app.route("/send_email", methods=["GET", "POST"])
+def send_email():
+    subject = "Test"
+    body = "This is a test"
+    sender = "crazycatcaretaker123@gmail.com"
+    recipients = ["crazycatcaretaker123@gmail.com"]
+    password = "wklhkcqzccnkgsvr"
+
+    print("hello!")
+    return email(subject, body, sender, recipients, password)
+
+
+
