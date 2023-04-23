@@ -1,5 +1,7 @@
 import time
 import smtplib
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import List
 
@@ -126,7 +128,8 @@ def landing_page():
     #     if request.form["playing_button"] == "clicked":
     #         flash("TODO: Laser pointer control page")
     #         return render_template("playing.html")
-    return render_template("landing_page.html")
+    notifications = House.get(session["mac_address"]).notifications
+    return render_template("landing_page.html", notifications=notifications)
 
 
 @app.route("/upload", methods=["POST"])
@@ -179,6 +182,10 @@ def upload_file():
                 print("CAT FED", cat.name)
                 food_amount = min(Cats.DISPENSE_AMOUNT, max_food_amount - current_food_amount)
                 cat_house.add_notification(Notifications(f"{cat.name} has been fed {food_amount} units of food!", time.time()))
+                users = get_users_emails_from_house(cat_house)
+                date_time = datetime.fromtimestamp(timestamp)
+                str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+                email(f"Cat feeding at {str_time}", f"{cat.name} has been fed {food_amount} units of food.", users, image=image)
                 cat_house.events.dispense_amount = food_amount
                 cat_house.events.dispense_changed = True
                 cat.daily_food = current_food_amount + food_amount
@@ -198,6 +205,17 @@ def upload_file():
     # file.save(filename)
     return "Success"
 
+# A very poor way of getting the users associated with a house
+def get_users_emails_from_house(house: House):
+    mac_address = house.mac_address
+    house_user_emails = []
+    all_users = Users.ref.get()
+    for user in all_users:
+        user = user.to_dict()
+        if user["mac_address"] == mac_address:
+            house_user_emails.append(user["email"])
+
+    return house_user_emails
 
 @app.route("/stream", methods=["POST"])
 @Authentication.login_required
@@ -205,6 +223,14 @@ def stream():
     # TODO
     return "Success"
 
+@app.route("/clear_notifications", methods=["POST"])
+@Authentication.login_required
+def clear_notifications():
+    house = House.get(session["mac_address"])
+    house.clear_notifications()
+    house.create()
+
+    return redirect("/")
 
 def gen(camera: Camera):
     while True:
@@ -219,24 +245,31 @@ def video_feed():
     return Response(gen(Camera(video_key)), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
-def email(subject, body, sender, recipients, password):
-    msg = MIMEText(body)
-    msg['Subject'] = subject
-    msg['From'] = sender
-    msg['To'] = ', '.join(recipients)
-    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    smtp_server.login(sender, password)
-    smtp_server.sendmail(sender, recipients, msg.as_string())
-    smtp_server.quit()
+def email(subject, body, recipients, image=None):
+    if image is not None:
+        message = MIMEMultipart()
+        message['Subject'] = subject
+        message['From'] = "crazycatcaretaker123@gmail.com"
+        message['To'] = ', '.join(recipients)
+        html_part = MIMEText(body)
+        message.attach(html_part)
+        message.attach(MIMEImage(image))
+    else:
+        message = MIMEText(body)
+        message['Subject'] = subject
+        message['From'] = "crazycatcaretaker123@gmail.com"
+        message['To'] = ', '.join(recipients)
 
+    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    smtp_server.login("crazycatcaretaker123@gmail.com", "wklhkcqzccnkgsvr")
+    smtp_server.sendmail("crazycatcaretaker123@gmail.com", recipients, message.as_string())
+    smtp_server.quit()
 
 @app.route("/send_email", methods=["GET", "POST"])
 def send_email():
     subject = "Test"
     body = "This is a test"
-    sender = "crazycatcaretaker123@gmail.com"
     recipients = ["crazycatcaretaker123@gmail.com"]
-    password = "wklhkcqzccnkgsvr"
 
     print("hello!")
-    return email(subject, body, sender, recipients, password)
+    return email(subject, body, recipients)
