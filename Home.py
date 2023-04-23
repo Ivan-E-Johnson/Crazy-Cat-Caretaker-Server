@@ -43,7 +43,7 @@ class DatabaseObject():
 
     @staticmethod
     def _from_dict(cls, source):
-        if source is None:
+        if source is None or source == [] or source == {}:
             return None
         args = []
         for arg in cls.attrs:
@@ -80,7 +80,7 @@ class Users(DatabaseObject):
 class House(DatabaseObject):
     ref = db.collection("Home")
     pk = "mac_address"
-    attrs = ["mac_address", "cats", "events"]
+    attrs = ["mac_address", "cats", "events", "notifications"]
 
     def __init__(self, mac_address, cats, events, notifications):
         self.mac_address = mac_address
@@ -114,8 +114,8 @@ class Notifications(DatabaseObject):
     attrs = ["message", "time"]
 
     def __init__(self, message, time):
-        self.name = message
-        self.max_food = time
+        self.message = message
+        self.time = time
 
 
 class Cats(DatabaseObject):

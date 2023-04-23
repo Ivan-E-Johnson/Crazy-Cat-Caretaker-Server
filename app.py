@@ -1,11 +1,7 @@
 import time
-<<<<<<< HEAD
-
 import smtplib
 from email.mime.text import MIMEText
-=======
 from typing import List
->>>>>>> 165a4ee (Teachable machine is working.)
 
 from flask import (
     Flask,
@@ -25,7 +21,7 @@ from flask_sse import sse
 from redis import Redis
 import pyrebase
 import Authentication
-from Home import Users, House, Cats, HomeEvents
+from Home import Users, House, Cats, HomeEvents, Notifications
 import time
 from datetime import datetime
 
@@ -162,6 +158,7 @@ def upload_file():
             ONE_MINUTE = 60
 
             if not cat.present and float(cat.last_visit) + ONE_MINUTE < time.time():
+                cat_house.add_notification(Notifications(f"{cat.name} says hi!", time.time()))
                 print("CAT VISITED", cat.name)
                 cat.number_of_visits += 1
                 timestamp = time.time()
@@ -181,6 +178,7 @@ def upload_file():
             if current_food_amount < max_food_amount and float(cat.last_fed) + Cats.FOOD_FREQUENCY < time.time():
                 print("CAT FED", cat.name)
                 food_amount = min(Cats.DISPENSE_AMOUNT, max_food_amount - current_food_amount)
+                cat_house.add_notification(Notifications(f"{cat.name} has been fed {food_amount} units of food!", time.time()))
                 cat_house.events.dispense_amount = food_amount
                 cat_house.events.dispense_changed = True
                 cat.daily_food = current_food_amount + food_amount
