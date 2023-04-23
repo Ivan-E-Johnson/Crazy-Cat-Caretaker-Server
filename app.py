@@ -93,12 +93,9 @@ def logout():
 @Authentication.login_required
 def laser_up_down():
     house: House = House.get(session["mac_address"])
-    print(house)
     house.events.laser_state = "up_down"
     house.events.laser_changed = True
-    print(house)
     house.create()
-    print(house)
     flash("Laser state updated")
     return redirect('/playing')
 
@@ -151,7 +148,6 @@ def laser_off():
 @Authentication.login_required
 def feeding():
     if request.method == 'POST':
-        print(request.form)
         cat_name = request.form.get("pick_cat")
         food_amount = request.form.get("pick_amount")
         house = House.get(session["mac_address"])
@@ -172,7 +168,6 @@ def feeding():
         users = get_users_emails_from_house(house)
 
         date_time = datetime.fromtimestamp(time.time())
-        print("here:" + str(date_time))
         str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
 
         email(f"Cat feeding at {str_time}", message, users)
@@ -285,11 +280,9 @@ def upload_file():
         else:
             # Set all cats to not present
             cat_house: House = House.get(mac_address)
-            print(cat_house)
             cats: List[Cats] = cat_house.cats
             for house_cat in cats:
                 house_cat.present = False
-            print(cat_house)
             cat_house.create()
 
     # We cannot save files directly after reading them or vice versa
@@ -367,7 +360,6 @@ def send_email():
     body = "This is a test"
     recipients = ["crazycatcaretaker123@gmail.com"]
 
-    print("hello!")
     return email(subject, body, recipients)
 
 
@@ -382,7 +374,6 @@ def cat_profiles():
 @Authentication.login_required
 def add_cat():
     house: House = House.get(session["mac_address"])
-    print(house.cats)
     if request.method == 'POST':
         cat_name = request.form.get("cat-name")
         max_food = request.form.get("max-food")
