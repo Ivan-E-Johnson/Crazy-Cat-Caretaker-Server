@@ -143,10 +143,44 @@ def laser_off():
     return redirect('/playing')
 
 
-@app.route("/feeding")
+@app.route("/feeding", methods=["GET", "POST"])
 @Authentication.login_required
 def feeding():
-    return render_template("feeding.html")
+    if request.method == 'POST':
+        print(request.form)
+        cat_name = request.form.get("pick_cat")
+        food_amount = request.form.get("pick_amount")
+        house = House.get(session["mac_address"])
+
+        cats: List[Cats] = house.cats
+        cat = None
+        for house_cat in cats:
+            if house_cat.name == cat_name:
+                print("CAT FOUND", house_cat.name)
+                cat = house_cat
+        assert cat is not None  # Should handle this better but we are making some assumptions for now
+
+        print("CAT FED", cat.name)
+        food_amount = int(food_amount)
+        message = f"{cat.name} has been manually fed {food_amount} units of food!"
+        house.add_notification(Notifications(message, time.time()))
+        flash(message)
+        users = get_users_emails_from_house(house)
+        date_time = datetime.fromtimestamp(time.time())
+        str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+        email(f"Cat feeding at {str_time}", message, users)
+        house.events.dispense_amount = food_amount
+        house.events.dispense_changed = True
+        cat.daily_food = cat.daily_food + food_amount
+        cat.last_fed = time.time()
+        house.create()
+
+        return redirect("/feeding")
+    else:
+        house = House.get(session["mac_address"])
+        cats: List[Cats] = house.cats
+        cat_names = [cat.name for cat in cats]
+        return render_template("feeding.html", cat_names=cat_names)
 
 
 @app.route("/playing", methods=["GET", "POST"])
@@ -286,6 +320,7 @@ def clear_notifications():
     house.create()
 
     return redirect("/")
+
 
 def gen(camera: Camera):
     while True:
