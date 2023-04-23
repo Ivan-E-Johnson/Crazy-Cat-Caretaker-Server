@@ -21,16 +21,16 @@
 
 <body>
     {% if "user" in session %}
+    <div class="button align-right" style="margin-bottom:25px">
         <form action="{{ url_for('logout') }}" method="GET">
-            <div class="button">
-                <button type="submit" style="font-size:10px;background-color:#f0e580;" name="logout_button" value="clicked">
+                <button class="align-top right-button" type="submit" style="font-size:10px;background-color:#5FCFEC" name="logout_button" value="clicked">
                     <b>LOG OUT</b>
                 </button>
-            </div>
         </form>
+    </div>
     {% endif %}
 
-    <div style="font-size:21px; color:#203354; font-family: Times New Roman; border:solid;
+    <div style="font-size:21px; color:#203354; margin-top:10px; font-family: Times New Roman; border:solid;
                 background-color:#f79ac0; margin-top:15px; margin-bottom:30px">
         <img src="static/logo.png" alt="Logo" width="95" height="75">
         <b>CRAZY CAT CARETAKER</b>

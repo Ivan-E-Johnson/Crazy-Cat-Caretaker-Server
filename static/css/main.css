@@ -57,4 +57,29 @@ display: block;
 margin: auto;
 }
 
+.arrow-button {
+  position: relative;
+  padding-right: 30px; /* Make room for the arrow */
+  border: none;
+  background-color: #4CAF50; /* Set the button background color */
+  color: white; /* Set the button text color */
+  font-size: 16px; /* Set the button font size */
+}
 
+.right-button {
+      float: right;
+    }
+
+.container {
+  position: relative;
+}
+
+.align-top {
+  position: absolute;
+  top: 10px;
+}
+
+.align-right {
+    float:right;
+    margin-right: 63px;
+}
