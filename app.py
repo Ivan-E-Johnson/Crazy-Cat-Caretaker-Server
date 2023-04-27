@@ -243,15 +243,14 @@ def upload_file():
             TWENTY_FOUR_HOURS = 86400  # seconds in 24 hours
             ONE_MINUTE = 60
 
-
             if not cat.present and float(cat.last_visit) + ONE_MINUTE < time.time():
                 cat_house.add_notification(Notifications(f"{cat.name} says hi!", time.time()))
                 print("CAT VISITED", cat.name)
                 cat.number_of_visits += 1
                 timestamp = time.time()
                 date_time = datetime.fromtimestamp(timestamp)
-                str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
-                cat.last_visit = str_time
+                # str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
+                cat.last_visit = date_time
 
             cat.present = True
 
