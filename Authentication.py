@@ -53,7 +53,6 @@ def login(email, password):
 def login_required(func):
     @wraps(func)
     def wrapper(*args, **kwds):
-        print("WE GOT HERE")
         if "user" in session:
             return func(*args, **kwds)
         else:

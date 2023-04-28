@@ -25,7 +25,6 @@ class DatabaseObject():
         return self.__dict__[self.__class__.pk]
 
     def create(self):
-        print(self.to_dict())
         self.__class__.ref.document(self.primary_key()).set(self.to_dict())
 
     def _transform_attrs(self, name, attr_class, attr_list_of_dicts):
@@ -120,8 +119,8 @@ class Notifications(DatabaseObject):
 
 
 class Cats(DatabaseObject):
-    DISPENSE_AMOUNT = 2.5 # dispense 2.5 units of food per feeding
-    FOOD_FREQUENCY = 120 # May feed cats every 2 mins if still present
+    DISPENSE_AMOUNT = 10 # dispense 2.5 units of food per feeding
+    FOOD_FREQUENCY = 10 # May feed cats every 2 mins if still present
     ref = None # Cats should be added to a house not to the db directly
     pk = None # Cats should be added to a house not to the db directly
     attrs = ["name", "max_food", "daily_food", "number_of_visits", "last_visit", "first_fed", "last_fed", "present"]

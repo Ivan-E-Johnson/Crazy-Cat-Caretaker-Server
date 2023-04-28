@@ -160,7 +160,7 @@ def feeding():
                 cat = house_cat
         assert cat is not None  # Should handle this better but we are making some assumptions for now
 
-        print("CAT FED", cat.name)
+        print("CAT FED manually", cat.name)
         food_amount = int(food_amount)
         message = f"{cat.name} has been manually fed {food_amount} units of food!"
         house.add_notification(Notifications(message, time.time()))
@@ -171,7 +171,7 @@ def feeding():
         str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
 
         email(f"Cat feeding at {str_time}", message, users)
-        house.events.dispense_amount = food_amount
+        house.events.dispense_amount = food_amount * 2
         house.events.dispense_changed = True
         cat.daily_food = cat.daily_food + food_amount
         cat.last_fed = time.time()
@@ -243,41 +243,44 @@ def upload_file():
             TWENTY_FOUR_HOURS = 86400  # seconds in 24 hours
             ONE_MINUTE = 60
 
-            if not cat.present and float(cat.last_visit) + ONE_MINUTE < time.time():
+            if not cat.present and int(cat.last_visit) + ONE_MINUTE < time.time():
                 cat_house.add_notification(Notifications(f"{cat.name} says hi!", time.time()))
                 print("CAT VISITED", cat.name)
                 cat.number_of_visits += 1
                 timestamp = time.time()
-                date_time = datetime.fromtimestamp(timestamp)
+                # date_time = datetime.fromtimestamp(timestamp)
                 # str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
-                cat.last_visit = date_time
+                cat.last_visit = timestamp
 
             cat.present = True
 
-            if time.time() > float(cat.first_fed) + TWENTY_FOUR_HOURS:
+            if time.time() > int(cat.first_fed) + TWENTY_FOUR_HOURS:
                 print("CAT FOOD RESET", cat.name)
                 cat.daily_food = 0
                 cat.first_fed = time.time()
 
             current_food_amount = cat.daily_food
             max_food_amount = cat.max_food
-            if current_food_amount < max_food_amount and float(cat.last_fed) + Cats.FOOD_FREQUENCY < time.time():
-                print("CAT FED", cat.name)
+            if current_food_amount < max_food_amount and int(cat.last_fed) + Cats.FOOD_FREQUENCY < time.time():
+                sse.publish({"present": f'{cat.name} has been fed'}, type=f"{mac_address}_notifications")
                 food_amount = min(Cats.DISPENSE_AMOUNT, max_food_amount - current_food_amount)
+                print(f"CAT FED {food_amount}", cat.name)
                 cat_house.add_notification(Notifications(f"{cat.name} has been fed {food_amount} units of food!", time.time()))
                 users = get_users_emails_from_house(cat_house)
-                date_time = datetime.fromtimestamp(timestamp)
+                date_time = datetime.fromtimestamp(time.time())
                 str_time = date_time.strftime("%d-%m-%Y, %H:%M:%S")
                 email(f"Cat feeding at {str_time}", f"{cat.name} has been fed {food_amount} units of food.", users, image=image)
                 cat_house.events.dispense_amount = food_amount
                 cat_house.events.dispense_changed = True
                 cat.daily_food = current_food_amount + food_amount
                 cat.last_fed = time.time()
-
+            else:
+                sse.publish({"present": f'{cat.name} is here'}, type=f"{mac_address}_notifications")
 
             cat_house.create()
         else:
             # Set all cats to not present
+            sse.publish({"present": ""}, type=f"{mac_address}_notifications")
             cat_house: House = House.get(mac_address)
             cats: List[Cats] = cat_house.cats
             for house_cat in cats:
@@ -302,11 +305,11 @@ def get_users_emails_from_house(house: House):
     return house_user_emails
 
 
-@app.route("/stream", methods=["POST"])
-@Authentication.login_required
-def stream():
-    # TODO
-    return "Success"
+# @app.route("/stream", methods=["POST"])
+# @Authentication.login_required
+# def stream():
+#     # TODO
+#     return "Success"
 
 
 @app.route("/clear_notifications", methods=["POST"])
